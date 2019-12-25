@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Row, Col, Button, Form, InputNumber, Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { getBalanceActiveAA, updateInfoActiveAA } from '../../store/actions/aa';
 import { SelectAA } from '../../components/SelectAA/SelectAA';
 
 import config from './../../config';
-
+import styles from '../Main/Main.module.css'
 const { Title } = Typography;
 
 export default () => {
@@ -18,14 +18,14 @@ export default () => {
         value: '',
         status: '',
         help: '',
-        btnActive: false
+        valid: false
     });
 
     const [statusAdress, setStatusAdress] = useState({
-        value: 'AFVAFTQHJ47TDGEEP4J7ATQ7DD3B2ABX',
+        value: '',
         status: '',
         help: '',
-        btnActive: false
+        valid: false
     });
     const { AA } = useParams();
     const [visibleAddAaModal, setVisibleAddAaModal] = useState({ visible: !!AA, value: AA || null });
@@ -37,18 +37,30 @@ export default () => {
 
     const handleAmount = (amount) => {
         if (amount < 100000) {
-            setStatusAmount({ value: amount, status: 'error', help: 'The minimum amount is 100,000 bytes', btnActive: false })
+            setStatusAmount({ value: amount, status: 'error', help: 'The minimum amount is 100,000 bytes', valid: false })
         } else {
-            setStatusAmount({ value: amount, status: 'success', help: '', btnActive: true })
+            if (!aaActiveInfo.winner) {
+                if (aaActiveInfo.yes_asset) {
+                    if (aaActiveInfo.no_asset) {
+                        setStatusAmount({ value: amount, status: 'success', help: '', valid: true })
+                    } else {
+                        setStatusAmount({ value: amount, status: 'error', help: 'no_asset has not been created', valid: false })
+                    }
+                } else {
+                    setStatusAmount({ value: amount, status: 'error', help: 'yes_asset has not been created', valid: false })
+                }
+            } else {
+                setStatusAmount({ value: amount, status: 'error', help: 'the winner has been chosen', valid: false })
+            }
         }
     }
 
     const handleChangeAdress = (ev) => {
         const address = ev.target.value;
         if (!obyte.utils.isValidAddress(address)) {
-            setStatusAdress({ value: address, status: 'error', help: 'Address is not valid', btnActive: false })
+            setStatusAdress({ value: address, status: 'error', help: 'Address is not valid', valid: false })
         } else {
-            setStatusAdress({ value: address, status: 'success', help: '', btnActive: true })
+            setStatusAdress({ value: address, status: 'success', help: '', valid: true })
         }
     }
 
@@ -56,11 +68,18 @@ export default () => {
         dispatch(getBalanceActiveAA(statusAdress.value));
         dispatch(updateInfoActiveAA(aaActive));
     }
-
+    useEffect(() => {
+        if (aaActive) {
+            const update = setInterval(() => dispatch(updateInfoActiveAA(aaActive)), 10000)
+            return () => {
+                clearInterval(update)
+            }
+        }
+    }, [aaActive, dispatch])
     return (
         <Layout title="Dashboard" page="dashboard" >
             <Form>
-                <Row style={{ marginBottom: 60 }}>
+                <Row className={styles.SelectAaRow}>
                     <Col xs={{ span: 24 }} md={{ span: 12 }}>
                         <Form.Item>
                             <SelectAA />
@@ -77,7 +96,7 @@ export default () => {
                     </Col>
                 </Row>
             </Form>
-            <Row>
+            {aaActive && <Row>
                 <Col xs={{ span: 24 }} md={{ span: 10 }}>
                     <Title level={2}>Investment</Title>
                     <Form>
@@ -95,24 +114,19 @@ export default () => {
                                 </Form.Item>
                             </Col>
                             <Col xs={{ span: 24, push: 0 }} lg={{ span: 7, push: 1 }}>
-                                <Form.Item>
+                                <Form.Item onClick={() => console.log('form click')}>
                                     <a
                                         type="primary"
-                                        disabled={!(statusAmount.btnActive && !!aaActive)}
+                                        disabled={!(statusAmount.valid && !!aaActive)}
                                         size="large"
                                         href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=${statusAmount.value}&amp;asset=base`}
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="ant-btn ant-btn-primary ant-btn-lg"
-                                    >
-                                        Next
-                                                </a>
+                                    >Next</a>
                                 </Form.Item>
                             </Col>
                         </Row>
-                        <ModalAddAA
-                            visible={visibleAddAaModal.visible}
-                            value={visibleAddAaModal.value}
-                            onCancel={() => setVisibleAddAaModal(false)} />
                     </Form>
                 </Col>
                 <Col xs={{ span: 24 }} md={{ span: 12, push: 2 }}>
@@ -136,17 +150,15 @@ export default () => {
                                     <Button
                                         type="primary"
                                         size="large"
-                                        disabled={!(statusAdress.btnActive && !!aaActive)}
+                                        disabled={!(statusAdress.valid && !!aaActive)}
                                         onClick={handleClick}
-                                    >
-                                        Search
-                                                </Button>
+                                    >Search</Button>
                                 </Form.Item>
                             </Col>
                         </Row>
                         <Row>
                             {
-                                aaActiveBalance.loading && <div style={{ backgroundColor: '#F0F2F5', wordBreak: 'break-all', padding: 25, borderRadius: 5, fontSize: 18 }}>
+                                statusAdress.valid && aaActiveBalance.loading && <div style={{ backgroundColor: '#F0F2F5', wordBreak: 'break-all', padding: 25, borderRadius: 5, fontSize: 18 }}>
                                     <Row>
                                         <b>winner: </b>
                                         {aaActiveInfo.winner ? aaActiveInfo.winner + '_asset' : 'the winner has not yet been chosen'}
@@ -174,6 +186,7 @@ export default () => {
                                                 size="large"
                                                 href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=${aaActiveBalance[aaActiveInfo.winner + '_asset']}&amp;&asset=${encodeURIComponent(aaActiveInfo[aaActiveInfo.winner + '_asset'])}`}
                                                 target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="ant-btn ant-btn-lg"
                                             >
                                                 Exchange for bytes
@@ -185,7 +198,11 @@ export default () => {
                         </Row>
                     </Form>
                 </Col>
-            </Row>
+            </Row>}
+            <ModalAddAA
+                visible={visibleAddAaModal.visible}
+                value={visibleAddAaModal.value}
+                onCancel={() => setVisibleAddAaModal(false)} />
         </Layout>
     )
 }
