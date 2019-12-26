@@ -26,8 +26,6 @@ export const Sidebar = ({ active }) => (
         <Menu
             theme="light"
             defaultSelectedKeys={[active]}
-            onOpenChange={() => console.log('change')}
-            onDeselect={() => console.log('change2')}
         >
             {dataMenu.map(item => {
                 return (
