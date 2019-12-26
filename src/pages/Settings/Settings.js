@@ -45,8 +45,6 @@ export default () => {
         extra={
             <a
                 href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataBase64}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="ant-btn ant-btn-primary ant-btn-lg"
             >Issue</a>
         } />
@@ -58,8 +56,6 @@ export default () => {
         extra={
             <a
                 href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataBase64}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="ant-btn ant-btn-primary ant-btn-lg"
             >Issue</a>
         } />

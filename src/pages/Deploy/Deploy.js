@@ -273,7 +273,7 @@ export default () => {
                         </Col>
                         <Col xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 10 }} xxl={{ span: 8 }}>
                             <Form.Item>
-                                <a className="ant-btn ant-btn-lg" href={`byteball-tn:data?app=definition`} target="_blank" rel="noopener noreferrer">Open deploy screen</a>
+                                <a className="ant-btn ant-btn-lg" href={`byteball-tn:data?app=definition`}>Open deploy screen</a>
                             </Form.Item>
                         </Col>
                     </Row>

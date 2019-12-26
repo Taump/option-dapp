@@ -134,8 +134,6 @@ export default () => {
                                         disabled={!(statusAmount.valid && !!aaActive)}
                                         size="large"
                                         href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=${statusAmount.value}&amp;asset=base`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
                                         className="ant-btn ant-btn-primary ant-btn-lg"
                                     >Next</a>
                                 </Form.Item>
@@ -199,8 +197,6 @@ export default () => {
                                                 type="primary"
                                                 size="large"
                                                 href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=${aaActiveBalance[aaActiveInfo.winner + '_asset']}&amp;&asset=${encodeURIComponent(aaActiveInfo[aaActiveInfo.winner + '_asset'])}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
                                                 className="ant-btn ant-btn-lg"
                                             >
                                                 Exchange for bytes
@@ -226,15 +222,11 @@ export default () => {
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                     <a
                         href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataWinnerYesBase64}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="ant-btn ant-btn-primary ant-btn-lg"
                     >yes_asset</a>
 
                     <a
                         href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataWinnerNoBase64}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="ant-btn ant-btn-primary ant-btn-lg"
                     >no_asset</a>
                 </div>
