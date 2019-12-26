@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, Input, Select, DatePicker, Button } from 'antd';
+import { Row, Col, Form, Input, Select, DatePicker, Button, Alert } from 'antd';
 import obyte from 'obyte';
 import copy from 'copy-to-clipboard';
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
-import { ModalAddAA } from '../../components/ModalAddAA/ModalAddAA'
+
 import { Layout } from '../../components/Layout/Layout';
 import { clearBalanceActiveAA } from '../../store/actions/aa';
 
 import styles from '../Deploy/Deploy.module.css';
+
 
 const { Option } = Select;
 
@@ -35,7 +36,6 @@ export default () => {
     const [comparison, setComparison] = useState('');
     const [expiryDate, setExpiryDate] = useState('')
     const [feedValue, setFeedValue] = useState('')
-    const [visibleAddAaModal, setVisibleAddAaModal] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -138,21 +138,22 @@ export default () => {
                 messages: [{
                     app: 'state',
                     state: \`{
+                        $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]];
                         if ($comparison == '>')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] > $feed_value;
+                            $datafeed_comparison = $datafeed_value > $feed_value;
                         else if ($comparison == '<')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] < $feed_value;
+                            $datafeed_comparison = $datafeed_value < $feed_value;
                         else if ($comparison == '!=')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] != $feed_value;
+                            $datafeed_comparison = $datafeed_value != $feed_value;
                         else if ($comparison == '==')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] == $feed_value;
+                            $datafeed_comparison = $datafeed_value == $feed_value;
                         else if ($comparison == '>=')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] >= $feed_value;
+                            $datafeed_comparison = $datafeed_value >= $feed_value;
                         else if ($comparison == '<=')
-                            $datafeed_value = data_feed[[oracles=$oracle_address, feed_name=$feed_name]] <= $feed_value;
+                            $datafeed_comparison = $datafeed_value <= $feed_value;
                         else
                             bounce('Comparison operator not found');
-                        if (trigger.data.winner == 'yes' AND  $datafeed_value)
+                        if (trigger.data.winner == 'yes' AND  $datafeed_comparison)
                             var['winner'] = 'yes';
                         else if (trigger.data.winner == 'no' AND timestamp > parse_date($expiry_date))
                             var['winner'] = 'no';
@@ -181,11 +182,13 @@ export default () => {
         copy(AAstr);
     }
 
-
-    return (<Layout title="Deploy" page="deploy" >
+    return (<Layout title="Deploy" page="deploy">
         <Row>
             <Col xs={{ span: 24 }} md={{ span: 18 }} xl={{ span: 14 }} >
                 <Form>
+                    <Row className={styles.alertWrap}>
+                        <Alert message="After the deployment, go to the settings for issue assets" type="warning" />
+                    </Row>
                     <Row>
                         <Form.Item hasFeedback validateStatus={oracle.status} help={oracle.help}>
                             <Input
@@ -270,17 +273,12 @@ export default () => {
                         </Col>
                         <Col xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 10 }} xxl={{ span: 8 }}>
                             <Form.Item>
-                                <span onClick={() => setVisibleAddAaModal(true)} >
-                                    <a className="ant-btn ant-btn-lg" href={`byteball-tn:data?app=definition`} target="_blank" rel="noopener noreferrer">Open deploy screen</a>
-                                </span>
+                                <a className="ant-btn ant-btn-lg" href={`byteball-tn:data?app=definition`} target="_blank" rel="noopener noreferrer">Open deploy screen</a>
                             </Form.Item>
                         </Col>
                     </Row>
                 </Form>
             </Col>
-            <ModalAddAA
-                visible={visibleAddAaModal}
-                onCancel={() => setVisibleAddAaModal(false)} />
         </Row>
     </Layout>
     )

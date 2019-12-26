@@ -1,6 +1,5 @@
-.input,
-.select {
-    width: 100%;
+.SelectAaRow {
+    margin-bottom: 20px;
 }
 
 .alertWrap {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Modal, Form } from 'antd';
 import { useDispatch } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import obyte from 'obyte';
 
 import { addAA } from '../../store/actions/aa';
@@ -17,7 +16,6 @@ export const ModalAddAA = ({ visible, onCancel, value }) => {
         help: '',
         valid: false
     });
-    const [redirect, setRedirect] = useState(false)
 
     useEffect(() => {
         if (value) {
@@ -47,7 +45,6 @@ export const ModalAddAA = ({ visible, onCancel, value }) => {
                     dispatch(addAA(adressAA.value))
                     onCancel();
                     setAdressAA({ value: '', status: '', help: '', valid: false })
-                    setRedirect(true)
                 }
             }}
             onCancel={() => {
@@ -58,7 +55,7 @@ export const ModalAddAA = ({ visible, onCancel, value }) => {
             <Form>
                 <Form.Item hasFeedback validateStatus={adressAA.status} help={adressAA.help}>
                     <Input
-                        placeholder="Your adress"
+                        placeholder="AA adress"
                         onChange={handleChangeAdress}
                         value={adressAA.value}
                         className={styles.input}
@@ -67,7 +64,6 @@ export const ModalAddAA = ({ visible, onCancel, value }) => {
                     />
                 </Form.Item>
             </Form>
-            {redirect && <Redirect to="/" />}
         </Modal>
     )
 }

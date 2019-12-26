@@ -9,6 +9,7 @@ const { Sider } = Layout;
 const dataMenu = [
     { key: 'dashboard', icon: 'control', title: 'Dashboard', path: '/' },
     { key: 'deploy', icon: 'plus-circle', title: 'Deploy AA', path: '/deploy' },
+    { key: 'settings', icon: 'setting', title: 'Settings AA', path: '/settings' },
 ]
 
 export const Sidebar = ({ active }) => (

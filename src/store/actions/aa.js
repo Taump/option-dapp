@@ -12,7 +12,8 @@ import client from '../../socket';
 
 export const addAA = (value) => async dispatch => {
     const def = await client.api.getDefinition(value);
-    if (def[0] === "autonomous agent") {
+    console.log('def', def)
+    if (def && def[0] && def[0] === "autonomous agent") {
         await dispatch({
             type: ADD_AA,
             payload: value

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Row, Col, Button, Form, InputNumber, Input } from 'antd';
+import React, { useState } from 'react';
+import { Typography, Row, Col, Button, Form, InputNumber, Input, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import obyte from 'obyte';
+import base64url from "base64url";
 
 import { ModalAddAA } from '../../components/ModalAddAA/ModalAddAA';
 import { Layout } from '../../components/Layout/Layout'
@@ -29,11 +30,25 @@ export default () => {
     });
     const { AA } = useParams();
     const [visibleAddAaModal, setVisibleAddAaModal] = useState({ visible: !!AA, value: AA || null });
+    const [visibleWinnerModal, setVisibleWinnerModal] = useState(false);
 
     const dispatch = useDispatch();
     const aaActive = useSelector(state => state.aa.active);
     const aaActiveInfo = useSelector(state => state.aa.activeInfo);
     const aaActiveBalance = useSelector(state => state.aa.activeBalance);
+
+    const dataWinner = {
+        yes_asset: {
+            winner: 'yes'
+        },
+        no_asset: {
+            winner: 'no'
+        }
+    }
+    const dataWinnerYesStr = JSON.stringify(dataWinner.yes_asset);
+    const dataWinnerNoStr = JSON.stringify(dataWinner.no_asset);
+    const dataWinnerYesBase64 = base64url(dataWinnerYesStr);
+    const dataWinnerNoBase64 = base64url(dataWinnerNoStr);
 
     const handleAmount = (amount) => {
         if (amount < 100000) {
@@ -68,14 +83,7 @@ export default () => {
         dispatch(getBalanceActiveAA(statusAdress.value));
         dispatch(updateInfoActiveAA(aaActive));
     }
-    useEffect(() => {
-        if (aaActive) {
-            const update = setInterval(() => dispatch(updateInfoActiveAA(aaActive)), 10000)
-            return () => {
-                clearInterval(update)
-            }
-        }
-    }, [aaActive, dispatch])
+
     return (
         <Layout title="Dashboard" page="dashboard" >
             <Form>
@@ -85,13 +93,19 @@ export default () => {
                             <SelectAA />
                         </Form.Item>
                     </Col>
-                    <Col xs={{ span: 24, push: 0 }} md={{ span: 12, push: 1 }} >
+                    <Col xs={{ span: 24, push: 0 }} md={{ span: 11, push: 1 }} >
                         <Form.Item>
                             <Button
                                 type="primary"
                                 icon="plus"
                                 size="large"
+                                style={{ marginRight: 10 }}
                                 onClick={() => setVisibleAddAaModal({ visible: true })}>Add</Button>
+
+                            {aaActive && !aaActiveInfo.winner && <Button
+                                type="default"
+                                size="large"
+                                onClick={() => setVisibleWinnerModal(true)}>Choose a winner</Button>}
                         </Form.Item>
                     </Col>
                 </Row>
@@ -203,6 +217,28 @@ export default () => {
                 visible={visibleAddAaModal.visible}
                 value={visibleAddAaModal.value}
                 onCancel={() => setVisibleAddAaModal(false)} />
+            <Modal
+                visible={visibleWinnerModal}
+                footer={null}
+                title="Choose a winner"
+                onCancel={() => setVisibleWinnerModal(false)}
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <a
+                        href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataWinnerYesBase64}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ant-btn ant-btn-primary ant-btn-lg"
+                    >yes_asset</a>
+
+                    <a
+                        href={`byteball${config.testnet ? '-tn' : ''}:${aaActive}?amount=10000&base64data=${dataWinnerNoBase64}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ant-btn ant-btn-primary ant-btn-lg"
+                    >no_asset</a>
+                </div>
+            </Modal>
         </Layout>
     )
 }
