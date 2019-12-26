@@ -64,7 +64,7 @@ export default () => {
     }
 
     const handleChangeExpiryDate = (date) => {
-        let time = date.utc(true).toISOString();
+        let time = date.utc(true).milliseconds(0).toISOString();
         setExpiryDate(time)
     }
 
