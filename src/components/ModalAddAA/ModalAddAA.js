@@ -1,69 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { Input, Modal, Form } from 'antd';
-import { useDispatch } from 'react-redux';
-import obyte from 'obyte';
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Select, Spin, Icon } from "antd";
+import { useDispatch, useSelector } from "react-redux";
 
-import { addAA } from '../../store/actions/aa';
+import { addAA, getAasByBase } from "../../store/actions/aa";
 
-import styles from '../ModalAddAA/ModalAddAA.module.css';
+import styles from "../ModalAddAA/ModalAddAA.module.css";
 
+const { Option } = Select;
 
-export const ModalAddAA = ({ visible, onCancel, value }) => {
-    const dispatch = useDispatch();
-    const [adressAA, setAdressAA] = useState({
-        value: '',
-        status: '',
-        help: '',
-        valid: false
-    });
+export const ModalAddAA = ({ onCancel }) => {
+  const dispatch = useDispatch();
+  const listByBaseLoaded = useSelector(state => state.aa.listByBaseLoaded);
+  const listByBase = useSelector(state => state.aa.listByBase);
+  const list = useSelector(state => state.aa.list);
+  const [addressAA, setAddressAA] = useState("");
 
-    useEffect(() => {
-        if (value) {
-            if (!obyte.utils.isValidAddress(value)) {
-                setAdressAA({ value, status: 'error', help: 'Address is not valid', valid: false })
-            } else {
-                setAdressAA({ value, status: 'success', help: '', valid: true })
-            }
+  useEffect(() => {
+    dispatch(getAasByBase());
+  }, [dispatch]);
+
+  const listByBaseForSelect = listByBase.filter(
+    arr => list.find(a => a === arr.address) === undefined
+  );
+
+  return (
+    <Modal
+      title="Add AA in dashboard"
+      visible={true}
+      onOk={() => {
+        if (addressAA) {
+          dispatch(addAA(addressAA));
         }
-    }, [value])
-
-    const handleChangeAdress = (ev) => {
-        const address = ev.target.value;
-        if (!obyte.utils.isValidAddress(address)) {
-            setAdressAA({ value: address, status: 'error', help: 'Address is not valid', valid: false })
-        } else {
-            setAdressAA({ value: address, status: 'success', help: '', valid: true })
-        }
-    }
-
-    return (
-        <Modal
-            title="Add AA in dashboard"
-            visible={visible}
-            onOk={() => {
-                if (adressAA.valid) {
-                    dispatch(addAA(adressAA.value))
-                    onCancel();
-                    setAdressAA({ value: '', status: '', help: '', valid: false })
-                }
-            }}
-            onCancel={() => {
-                onCancel();
-                setAdressAA({ value: '', status: '', help: '', valid: false })
-            }}
-        >
-            <Form>
-                <Form.Item hasFeedback validateStatus={adressAA.status} help={adressAA.help}>
-                    <Input
-                        placeholder="AA adress"
-                        onChange={handleChangeAdress}
-                        value={adressAA.value}
-                        className={styles.input}
-                        min={100000}
-                        size="large"
-                    />
-                </Form.Item>
-            </Form>
-        </Modal>
-    )
-}
+        onCancel();
+      }}
+      onCancel={() => {
+        onCancel();
+        setAddressAA("");
+      }}
+    >
+      {listByBaseLoaded ? (
+        <Form>
+          <Form.Item>
+            <Select
+              placeholder="Select a AA"
+              size="large"
+              showSearch={true}
+              onChange={setAddressAA}
+              autoFocus={true}
+              removeIcon={<Icon type="close" />}
+            >
+              <Option key={"AA0"} value={0} disabled>
+                Select a AA
+              </Option>
+              {listByBaseForSelect.map((aa, i) => (
+                <Option key={"AA" + i} value={aa.address}>
+                  {aa.address}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      ) : (
+        <div className={styles.spinWrap}>
+          <Spin size="large" />
+        </div>
+      )}
+    </Modal>
+  );
+};
