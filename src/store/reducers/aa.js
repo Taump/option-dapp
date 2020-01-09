@@ -1,6 +1,4 @@
 import {
-  ADD_AA,
-  ADD_AA_ERR,
   CHANGE_ACTIVE_AA,
   GET_BALANCE_ACTIVE_AA,
   UPDATE_INFO_ACTIVE_AA,
@@ -8,13 +6,17 @@ import {
   LOAD_AA_LIST_REQUEST,
   LOAD_AA_LIST_SUCCESS,
   ADD_AA_NOTIFICATION,
-  VIEWED_NOTIFICATION
+  VIEWED_NOTIFICATION,
+  LOADING_NOTIFICATION,
+  SUBSCRIBE_AA,
+  CLEAR_SUBSCRIBE_AA
 } from "../types/aa";
 
 const initialState = {
   list: [],
   listByBase: [],
   listByBaseLoaded: [],
+  subscriptions: [],
   active: null,
   activeInfo: null,
   activeBalance: {
@@ -28,18 +30,6 @@ const initialState = {
 
 export const aaReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_AA: {
-      return {
-        ...state,
-        list: [action.payload, ...state.list]
-      };
-    }
-    case ADD_AA_ERR: {
-      return {
-        ...state,
-        error: true
-      };
-    }
     case CHANGE_ACTIVE_AA: {
       return {
         ...state,
@@ -105,14 +95,14 @@ export const aaReducer = (state = initialState, action) => {
         }
         return {
           ...state,
-          notifications: [...state.notifications, action.payload],
-          activeAssetsRequest: assets,
+          notifications: [action.payload, ...state.notifications],
+          activeAssetsRequest: { ...state.activeAssetsRequest, ...assets },
           isViewedNotifications: false
         };
       } else {
         return {
           ...state,
-          notifications: [...state.notifications, action.payload],
+          notifications: [action.payload, ...state.notifications],
           isViewedNotifications: false
         };
       }
@@ -121,6 +111,24 @@ export const aaReducer = (state = initialState, action) => {
       return {
         ...state,
         isViewedNotifications: true
+      };
+    }
+    case LOADING_NOTIFICATION: {
+      return {
+        ...state,
+        notifications: action.payload
+      };
+    }
+    case SUBSCRIBE_AA: {
+      return {
+        ...state,
+        subscriptions: [...state.subscriptions, action.payload]
+      };
+    }
+    case CLEAR_SUBSCRIBE_AA: {
+      return {
+        ...state,
+        subscriptions: []
       };
     }
     default:

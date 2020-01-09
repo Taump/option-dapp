@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateInfoActiveAA, watchRequestAas } from "../../store/actions/aa";
+import {
+  changeActiveAA,
+  updateInfoActiveAA,
+  watchRequestAas,
+  clearSubscribesAA
+} from "../../store/actions/aa";
+import client from "../../socket";
 
 export const UpdateActiveAA = props => {
   const dispatch = useDispatch();
@@ -22,5 +28,15 @@ export const UpdateActiveAA = props => {
     dispatch(watchRequestAas());
   }, [dispatch]);
 
+  useEffect(() => {
+    client.client.ws.addEventListener("close", () => {
+      dispatch(clearSubscribesAA());
+    });
+    client.client.ws.addEventListener("open", () => {
+      if (aaActive) {
+        dispatch(changeActiveAA(aaActive));
+      }
+    });
+  }, [dispatch, aaActive]);
   return <div>{props.children}</div>;
 };

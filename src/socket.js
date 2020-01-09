@@ -1,7 +1,9 @@
-// import obyte from 'obyte';
-import obyte from "./obyte.min";
+import obyte from "obyte";
 
-const client = new obyte.Client("wss://obyte.org/bb-test", { testnet: true });
+const client = new obyte.Client("wss://obyte.org/bb-test", {
+  testnet: true,
+  reconnect: true
+});
 
 setInterval(function() {
   client.api.heartbeat();

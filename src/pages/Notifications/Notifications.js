@@ -1,71 +1,56 @@
-import React, { useEffect, useState } from "react";
-import { Col, Row, Timeline, Select, Empty, Alert } from "antd";
+import React, { useEffect } from "react";
+import { Col, Row, Timeline, Empty, Form, Typography, Popover } from "antd";
 import { Layout } from "../../components/Layout/Layout";
-import styles from "../../components/SelectAA/SelectAA.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { viewedNotification } from "../../store/actions/aa";
-const { Option } = Select;
+import { SelectAA } from "../../components/SelectAA/SelectAA";
+const { Text } = Typography;
 export default () => {
   const dispatch = useDispatch();
-  const aaList = useSelector(state => state.aa.list);
-  const aaListCount = aaList.length;
+  const aaListByBase = useSelector(state => state.aa.listByBase);
+  const aaListByBaseCount = aaListByBase.length;
   const notifications = useSelector(state => state.aa.notifications);
-  const [selectedAa, setSelectedAA] = useState("all");
 
   useEffect(() => {
     dispatch(viewedNotification());
   }, [dispatch]);
 
-  const notificationsList =
-    selectedAa === "all"
-      ? notifications
-      : notifications.filter(n => n.AA === selectedAa);
+  const notificationsList = notifications;
 
   return (
     <Layout title="Notifications" page="notifications">
       <Row>
+        <Col xs={{ span: 24 }} md={{ span: 12 }}>
+          <Form.Item>
+            <SelectAA autoFocus={aaListByBaseCount !== 0} />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row>
         <Col xs={{ span: 24 }} md={{ span: 18 }} xl={{ span: 14 }}>
-          {aaListCount === 0 ? (
-            <Row style={{ marginBottom: 20 }}>
-              <Alert
-                message="Please add autonomous agent to the system for  track events"
-                type="warning"
-              />
-            </Row>
-          ) : (
-            <Row>
-              <Select
-                className={styles.select}
-                placeholder="Select a AA"
-                onChange={setSelectedAA}
-                value={selectedAa}
-                size="large"
-                autoFocus={true}
-              >
-                <Option key={"AA0"} value="all">
-                  All AA
-                </Option>
-                {aaList.map((aa, i) => (
-                  <Option key={"AAList" + i} value={aa}>
-                    {aa}
-                  </Option>
-                ))}
-              </Select>
-            </Row>
-          )}
           <Row style={{ marginTop: 50 }}>
             {notificationsList.length !== 0 ? (
               <Timeline>
                 {notificationsList.map((n, i) => (
                   <Timeline.Item key={"Timeline - " + i}>
-                    {selectedAa === "all" && <b>{n.AA}: </b>}
-                    {n.title}
+                    {n.tag !== "error" ? (
+                      n.title
+                    ) : (
+                      <Popover
+                        content={<div style={{ maxWidth: 500 }}>{n.title}</div>}
+                      >
+                        <Text type="danger" alt={"test"}>
+                          {n.title.substring(100, -10)}
+                          {n.title.length > 100 && `...`}
+                        </Text>
+                      </Popover>
+                    )}
                   </Timeline.Item>
                 ))}
               </Timeline>
             ) : (
               <div>
-                {aaListCount !== 0 && (
+                {aaListByBaseCount !== 0 && (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description="There are no notifications for this AA"

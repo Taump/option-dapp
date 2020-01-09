@@ -1,5 +1,4 @@
 import {
-  ADD_AA,
   CHANGE_ACTIVE_AA,
   GET_BALANCE_ACTIVE_AA,
   UPDATE_INFO_ACTIVE_AA,
@@ -7,13 +6,18 @@ import {
   LOAD_AA_LIST_REQUEST,
   LOAD_AA_LIST_SUCCESS,
   ADD_AA_NOTIFICATION,
-  VIEWED_NOTIFICATION
+  VIEWED_NOTIFICATION,
+  LOADING_NOTIFICATION,
+  SUBSCRIBE_AA,
+  CLEAR_SUBSCRIBE_AA
 } from "../types/aa";
 import { notification } from "antd";
 
 import client from "../../socket";
 import config from "../../config";
+import utils from "../../utils";
 
+const { createObjectNotification } = utils;
 export const getAasByBase = () => async dispatch => {
   try {
     await dispatch({
@@ -30,24 +34,19 @@ export const getAasByBase = () => async dispatch => {
     console.log("error", e);
   }
 };
-export const addAA = address => async dispatch => {
-  await client.justsaying("light/new_aa_to_watch", {
-    aa: address
-  });
-  await dispatch({
-    type: ADD_AA,
-    payload: address
-  });
-  await dispatch(changeActiveAA(address));
-};
 
-export const changeActiveAA = address => async dispatch => {
+export const changeActiveAA = (address, isSubscription) => async dispatch => {
   try {
     const aaState = await client.api.getAaStateVars({ address });
-    dispatch({
+    await dispatch({
       type: CHANGE_ACTIVE_AA,
       payload: { address, aaVars: aaState }
     });
+
+    await dispatch(getAllNotificationAA(address));
+    if (!isSubscription) {
+      await dispatch(subscribeAA(address));
+    }
   } catch (e) {
     console.log("error", e);
   }
@@ -85,83 +84,47 @@ const openNotificationRequest = (address, event) => {
 };
 export const watchRequestAas = () => dispatch => {
   try {
-    client.subscribe((err, result) => {
+    client.subscribe(async (err, result) => {
       if (result[1].subject === "light/aa_request") {
         if (
           result[1].body &&
           result[1].body.messages &&
           result[1].body.messages[0] &&
-          result[1].body.messages[0].payload
+          result[1].body.messages[1]
         ) {
-          const payload = result[1].body.messages[0].payload;
-          const AA =
-            result[1].body.messages[1] &&
-            result[1].body.messages[1].payload &&
-            result[1].body.messages[1].payload.outputs[1].address;
-          if ("define_yes" in payload) {
-            openNotificationRequest(AA, "Request for issue yes_asset");
+          const notificationObject = createObjectNotification.req(result[1]);
+          console.log(notificationObject);
+          if (notificationObject) {
+            openNotificationRequest(
+              notificationObject.AA,
+              notificationObject.title
+            );
             dispatch({
               type: ADD_AA_NOTIFICATION,
-              payload: {
-                AA,
-                title: "Request for issue yes_asset",
-                tag: "req_yes"
-              }
-            });
-          } else if ("define_no" in payload) {
-            openNotificationRequest(AA, "Request for issue no_asset");
-            dispatch({
-              type: ADD_AA_NOTIFICATION,
-              payload: {
-                AA,
-                title: "Request for issue no_asset",
-                tag: "req_no"
-              }
-            });
-          } else if ("winner" in payload) {
-            openNotificationRequest(AA, "Request to select a winner");
-            dispatch({
-              type: ADD_AA_NOTIFICATION,
-              payload: {
-                AA,
-                title: "Request to select a winner",
-                tag: "req_winner"
-              }
+              payload: notificationObject
             });
           }
         }
       } else if (result[1].subject === "light/aa_response") {
+        const AA = result[1].body.aa_address;
+        const aaVars = await client.api.getAaStateVars({ address: AA });
         if (
           result[1].body &&
           result[1].body.response &&
-          result[1].body.response.responseVars
+          result[1].body.response
         ) {
-          const res = result[1].body.response.responseVars;
-          const AA = result[1].body.aa_address;
-          if ("yes_asset" in res) {
-            openNotificationRequest(AA, "Yes_asset was issued");
-            dispatch({
-              type: ADD_AA_NOTIFICATION,
-              payload: { AA, title: "Yes_asset was issued", tag: "res_yes" }
-            });
-          } else if ("no_asset" in res) {
-            openNotificationRequest(AA, "No_asset was issued");
-            dispatch({
-              type: ADD_AA_NOTIFICATION,
-              payload: { AA, title: "No_asset was issued", tag: "res_no" }
-            });
-          } else if ("winner" in res) {
+          const notificationObject = createObjectNotification.res(
+            result[1].body,
+            aaVars
+          );
+          if (notificationObject) {
             openNotificationRequest(
-              AA,
-              `${res.winner}_asset was chosen as the winner`
+              notificationObject.AA,
+              notificationObject.title
             );
             dispatch({
               type: ADD_AA_NOTIFICATION,
-              payload: {
-                AA,
-                title: `${res.winner}_asset was chosen as the winner`,
-                tag: "res_winner"
-              }
+              payload: notificationObject
             });
           }
         }
@@ -178,3 +141,36 @@ export const viewedNotification = () => ({
 export const clearBalanceActiveAA = () => ({
   type: CLEAR_BALANCE_ACTIVE_AA
 });
+export const clearSubscribesAA = () => ({
+  type: CLEAR_SUBSCRIBE_AA
+});
+
+export const getAllNotificationAA = address => async dispatch => {
+  const notifications = await client.api.getAaResponses({
+    aa: address
+  });
+  const aaVars = await client.api.getAaStateVars({ address });
+
+  let notificationsList = [];
+  await notifications.forEach(n => {
+    const notificationObject = createObjectNotification.res(n, aaVars);
+    if (notificationObject) {
+      notificationsList.push(notificationObject);
+    }
+  });
+  await dispatch({
+    type: LOADING_NOTIFICATION,
+    payload: notificationsList
+  });
+};
+
+export const subscribeAA = address => async dispatch => {
+  await client.justsaying("light/new_aa_to_watch", {
+    aa: address
+  });
+
+  await dispatch({
+    type: SUBSCRIBE_AA,
+    payload: address
+  });
+};

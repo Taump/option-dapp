@@ -12,7 +12,6 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import obyte from "obyte";
 import base64url from "base64url";
-import { ModalAddAA } from "../../components/ModalAddAA/ModalAddAA";
 import { Layout } from "../../components/Layout/Layout";
 import { getBalanceActiveAA, updateInfoActiveAA } from "../../store/actions/aa";
 import { SelectAA } from "../../components/SelectAA/SelectAA";
@@ -35,10 +34,6 @@ export default props => {
     valid: false
   });
 
-  const [visibleAddAaModal, setVisibleAddAaModal] = useState({
-    visible: false,
-    value: null
-  });
   const [visibleWinnerModal, setVisibleWinnerModal] = useState(false);
 
   const dispatch = useDispatch();
@@ -140,17 +135,6 @@ export default props => {
           </Col>
           <Col xs={{ span: 24, push: 0 }} md={{ span: 11, push: 1 }}>
             <Form.Item>
-              <Button
-                type="primary"
-                icon="plus"
-                size="large"
-                style={{ marginRight: 10 }}
-                onClick={() => setVisibleAddAaModal({ visible: true })}
-                autoFocus={aaList.length === 0}
-              >
-                Add
-              </Button>
-
               {aaActive && !aaActiveInfo.winner && (
                 <Button
                   type="default"
@@ -310,12 +294,6 @@ export default props => {
             </Form>
           </Col>
         </Row>
-      )}
-      {visibleAddAaModal.visible && (
-        <ModalAddAA
-          value={visibleAddAaModal.value}
-          onCancel={() => setVisibleAddAaModal(false)}
-        />
       )}
       <Modal
         visible={visibleWinnerModal}
