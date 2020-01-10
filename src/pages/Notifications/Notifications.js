@@ -10,7 +10,7 @@ export default () => {
   const aaListByBase = useSelector(state => state.aa.listByBase);
   const aaListByBaseCount = aaListByBase.length;
   const notifications = useSelector(state => state.aa.notifications);
-
+  const aaActive = useSelector(state => state.aa.active);
   useEffect(() => {
     dispatch(viewedNotification());
   }, [dispatch]);
@@ -50,7 +50,7 @@ export default () => {
               </Timeline>
             ) : (
               <div>
-                {aaListByBaseCount !== 0 && (
+                {aaListByBaseCount !== 0 && !!aaActive && (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description="There are no notifications for this AA"

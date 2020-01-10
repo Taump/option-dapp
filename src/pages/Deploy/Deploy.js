@@ -5,21 +5,14 @@ import { useDispatch } from "react-redux";
 import moment from "moment";
 
 import { Layout } from "../../components/Layout/Layout";
+import utils from "../../utils";
 import { clearBalanceActiveAA } from "../../store/actions/aa";
 
 import styles from "../Deploy/Deploy.module.css";
 import config from "../../config";
 
 const { Option } = Select;
-
-const toNumericValue = value => {
-  const t = /^-{0,1}\d+$/.test(value);
-  if (t) {
-    return value;
-  } else {
-    return `'${value}'`;
-  }
-};
+const { toNumericValue } = utils;
 
 export default () => {
   const [oracle, setOracle] = useState({
@@ -66,10 +59,14 @@ export default () => {
   };
 
   const handleChangeExpiryDate = date => {
-    let time = date.utc(true).format("YYYY-DD-MM");
-    // .milliseconds(0);
-    // .toISOString();
-    setExpiryDate(time);
+    if (date) {
+      let time = date.utc(true).format("YYYY-DD-MM");
+      // .milliseconds(0);
+      // .toISOString();
+      setExpiryDate(time);
+    } else {
+      setExpiryDate("");
+    }
   };
   const AA = `{
 base_aa: '${config.base_aa}',

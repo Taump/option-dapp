@@ -11,6 +11,12 @@ const dataMenu = [
   { key: "dashboard", icon: "control", title: "Dashboard", path: "/" },
   { key: "deploy", icon: "plus-circle", title: "Deploy AA", path: "/deploy" },
   {
+    key: "search",
+    icon: "search",
+    title: "Search AA",
+    path: "/search"
+  },
+  {
     key: "issuing_assets",
     icon: "setting",
     title: "Issuing assets",

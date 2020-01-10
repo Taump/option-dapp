@@ -84,7 +84,6 @@ const createObjectResponseNotification = (data, aaVars) => {
 };
 
 const createObjectRequestNotification = data => {
-  console.log(data);
   if (
     data.body.messages[0].payload &&
     data.body.messages[1] &&

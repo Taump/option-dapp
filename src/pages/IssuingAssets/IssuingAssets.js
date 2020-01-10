@@ -14,7 +14,6 @@ const { Step } = Steps;
 export default () => {
   const aaActive = useSelector(state => state.aa.active);
   const aaActiveInfo = useSelector(state => state.aa.activeInfo);
-  const aaList = useSelector(state => state.aa.list);
   const aaActiveAssetsRequest = useSelector(
     state => state.aa.activeAssetsRequest
   );
@@ -94,7 +93,7 @@ export default () => {
         <Form>
           <Col xs={{ span: 24 }} md={{ span: 12 }}>
             <Form.Item>
-              <SelectAA autoFocus={aaList.length !== 0} />
+              <SelectAA autoFocus={true} />
             </Form.Item>
           </Col>
         </Form>

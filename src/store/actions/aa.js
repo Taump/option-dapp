@@ -35,14 +35,17 @@ export const getAasByBase = () => async dispatch => {
   }
 };
 
-export const changeActiveAA = (address, isSubscription) => async dispatch => {
+export const changeActiveAA = address => async (dispatch, getState) => {
   try {
     const aaState = await client.api.getAaStateVars({ address });
     await dispatch({
       type: CHANGE_ACTIVE_AA,
       payload: { address, aaVars: aaState }
     });
-
+    const store = getState();
+    const subscriptions = store.aa.subscriptions;
+    const isSubscription =
+      subscriptions.filter(aa => aa === address).length > 0;
     await dispatch(getAllNotificationAA(address));
     if (!isSubscription) {
       await dispatch(subscribeAA(address));
@@ -82,9 +85,11 @@ const openNotificationRequest = (address, event) => {
     style: { minWidth: 350 }
   });
 };
-export const watchRequestAas = () => dispatch => {
+export const watchRequestAas = () => (dispatch, getState) => {
   try {
     client.subscribe(async (err, result) => {
+      const store = getState();
+      const aaActive = store.aa.active;
       if (result[1].subject === "light/aa_request") {
         if (
           result[1].body &&
@@ -93,8 +98,7 @@ export const watchRequestAas = () => dispatch => {
           result[1].body.messages[1]
         ) {
           const notificationObject = createObjectNotification.req(result[1]);
-          console.log(notificationObject);
-          if (notificationObject) {
+          if (notificationObject && notificationObject.AA === aaActive) {
             openNotificationRequest(
               notificationObject.AA,
               notificationObject.title
@@ -117,7 +121,7 @@ export const watchRequestAas = () => dispatch => {
             result[1].body,
             aaVars
           );
-          if (notificationObject) {
+          if (notificationObject && notificationObject.AA === aaActive) {
             openNotificationRequest(
               notificationObject.AA,
               notificationObject.title

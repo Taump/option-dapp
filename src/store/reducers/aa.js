@@ -13,7 +13,6 @@ import {
 } from "../types/aa";
 
 const initialState = {
-  list: [],
   listByBase: [],
   listByBaseLoaded: [],
   subscriptions: [],

@@ -38,7 +38,6 @@ export default props => {
 
   const dispatch = useDispatch();
   const aaActive = useSelector(state => state.aa.active);
-  const aaList = useSelector(state => state.aa.list);
   const aaActiveInfo = useSelector(state => state.aa.activeInfo);
   const aaActiveBalance = useSelector(state => state.aa.activeBalance);
 
@@ -130,7 +129,7 @@ export default props => {
         <Row className={styles.SelectAaRow}>
           <Col xs={{ span: 24 }} md={{ span: 12 }}>
             <Form.Item>
-              <SelectAA autoFocus={aaList.length !== 0} />
+              <SelectAA autoFocus={true} />
             </Form.Item>
           </Col>
           <Col xs={{ span: 24, push: 0 }} md={{ span: 11, push: 1 }}>
