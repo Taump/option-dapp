@@ -17,7 +17,7 @@ import client from "../../socket";
 import config from "../../config";
 import utils from "../../utils";
 
-const { createObjectNotification } = utils;
+const { createObjectNotification, isAddressByBase } = utils;
 export const getAasByBase = () => async dispatch => {
   try {
     await dispatch({
@@ -34,21 +34,29 @@ export const getAasByBase = () => async dispatch => {
     console.log("error", e);
   }
 };
-
 export const changeActiveAA = address => async (dispatch, getState) => {
   try {
-    const aaState = await client.api.getAaStateVars({ address });
-    await dispatch({
-      type: CHANGE_ACTIVE_AA,
-      payload: { address, aaVars: aaState }
-    });
     const store = getState();
-    const subscriptions = store.aa.subscriptions;
-    const isSubscription =
-      subscriptions.filter(aa => aa === address).length > 0;
-    await dispatch(getAllNotificationAA(address));
-    if (!isSubscription) {
-      await dispatch(subscribeAA(address));
+    const isValid = await isAddressByBase(address);
+    if (isValid) {
+      const aaState = await client.api.getAaStateVars({ address });
+      await dispatch({
+        type: CHANGE_ACTIVE_AA,
+        payload: { address, aaVars: aaState }
+      });
+
+      const subscriptions = store.aa.subscriptions;
+      const isSubscription =
+        subscriptions.filter(aa => aa === address).length > 0;
+      await dispatch(getAllNotificationAA(address));
+      if (!isSubscription) {
+        await dispatch(subscribeAA(address));
+      }
+    } else {
+      console.log("Address is not found");
+      notification["error"]({
+        message: "Address is not found"
+      });
     }
   } catch (e) {
     console.log("error", e);

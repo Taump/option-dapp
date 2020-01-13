@@ -1,4 +1,4 @@
 import createObjectNotification from "./createObjectNotification";
 import toNumericValue from "./toNumericValue";
-
-export default { createObjectNotification, toNumericValue };
+import isAddressByBase from "./isAddressByBase";
+export default { createObjectNotification, toNumericValue, isAddressByBase };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Row,
@@ -12,6 +12,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import obyte from "obyte";
 import base64url from "base64url";
+import { useLocation, useHistory } from "react-router-dom";
 import { Layout } from "../../components/Layout/Layout";
 import { getBalanceActiveAA, updateInfoActiveAA } from "../../store/actions/aa";
 import { SelectAA } from "../../components/SelectAA/SelectAA";
@@ -20,6 +21,14 @@ import styles from "../Main/Main.module.css";
 const { Title } = Typography;
 
 export default props => {
+  let location = useLocation();
+  let history = useHistory();
+  useEffect(() => {
+    if (location && location.hash) {
+      history.push("/");
+    }
+  });
+
   const [statusAmount, setStatusAmount] = useState({
     value: "",
     status: "",

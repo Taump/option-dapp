@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Popover, Row } from "antd";
-
+import { Table, Popover, Row } from "antd";
+import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout } from "../../components/Layout/Layout";
 import { changeActiveAA, getAasByBase } from "../../store/actions/aa";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { truncate } from "lodash";
 import { SearchFormAA } from "../../components/SearchFormAA/SearchFormAA";
-
+import styles from "./Search.module.css";
 export default () => {
   const aaListByBase = useSelector(state => state.aa.listByBase);
   const listByBaseLoaded = useSelector(state => state.aa.listByBaseLoaded);
-  const aaActive = useSelector(state => state.aa.active);
   const dispatch = useDispatch();
-
+  let history = useHistory();
   useEffect(() => {
     dispatch(getAasByBase());
   }, [dispatch]);
@@ -35,6 +34,7 @@ export default () => {
   const truncateOptions = { length: width < 1280 ? 13 : 20 };
   const handleChangeAA = address => {
     dispatch(changeActiveAA(address));
+    history.push("/");
   };
   const columns = [
     {
@@ -129,22 +129,6 @@ export default () => {
       dataIndex: "expiry_date",
       key: "expiry_date",
       width: 100
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      align: "center",
-      render: (text, record) => (
-        <span>
-          <Button
-            type="primary"
-            onClick={() => handleChangeAA(record.address)}
-            disabled={aaActive === record.address}
-          >
-            Select
-          </Button>
-        </span>
-      )
     }
   ];
   const [searchAA, setSearchAA] = useState(null);
@@ -191,6 +175,14 @@ export default () => {
           columns={columns}
           size="middle"
           loading={!listByBaseLoaded}
+          rowClassName={styles.row}
+          onRow={record => {
+            return {
+              onClick: event => {
+                handleChangeAA(record.address);
+              }
+            };
+          }}
         />
       )}
       {width < 900 && (
@@ -199,18 +191,33 @@ export default () => {
             return (
               <div
                 key={"aa" + i}
-                style={{
-                  paddingBottom: 15,
-                  paddingTop: 15,
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                  wordBreak: "break-all",
-                  background: aaActive === aa.address ? "#f5f5f5" : "none"
+                className={styles.viewRow}
+                onClick={() => {
+                  handleChangeAA(aa.address);
                 }}
-                onClick={() => handleChangeAA(aa.address)}
               >
-                {aa.feed_name} {aa.comparison} {aa.feed_value} on{" "}
-                {aa.expiry_date} ({aa.address})
+                {/*<div>*/}
+                {/*  {aa.feed_name} {aa.comparison} {aa.feed_value} on{" "}*/}
+                {/*  {aa.expiry_date} ({aa.address})*/}
+                {/*</div>*/}
+                <div>
+                  <b>Address:</b> {aa.address}
+                </div>
+                <div>
+                  <b>Oracle:</b> {aa.oracle}
+                </div>
+                <div>
+                  <b>Feed name:</b> {aa.feed_name}
+                </div>
+                <div>
+                  <b>Comparison:</b> {aa.comparison}
+                </div>
+                <div>
+                  <b>Feed value:</b> {aa.feed_value}
+                </div>
+                <div>
+                  <b>Expiry date:</b> {aa.expiry_date}
+                </div>
               </div>
             );
           })}
