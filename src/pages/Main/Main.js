@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Typography,
   Row,
@@ -49,6 +49,8 @@ export default props => {
   const aaActive = useSelector(state => state.aa.active);
   const aaActiveInfo = useSelector(state => state.aa.activeInfo);
   const aaActiveBalance = useSelector(state => state.aa.activeBalance);
+
+  const investmentLink = useRef(null);
 
   const dataWinner = {
     yes_asset: {
@@ -131,7 +133,13 @@ export default props => {
     dispatch(getBalanceActiveAA(statusAddress.value));
     dispatch(updateInfoActiveAA(aaActive));
   };
-
+  const handleKeyDownAmount = e => {
+    if (e.keyCode === 13) {
+      if (statusAmount.valid) {
+        investmentLink.current.click();
+      }
+    }
+  };
   return (
     <Layout title="Dashboard" page="dashboard">
       <Form>
@@ -175,6 +183,7 @@ export default props => {
                       style={{ width: "100%" }}
                       min={100000}
                       size="large"
+                      onKeyDown={handleKeyDownAmount}
                     />
                   </Form.Item>
                 </Col>
@@ -189,6 +198,7 @@ export default props => {
                         statusAmount.value
                       }&amp;asset=base`}
                       className="ant-btn ant-btn-primary ant-btn-lg"
+                      ref={investmentLink}
                     >
                       Next
                     </a>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Form, Input, Select, DatePicker, Alert } from "antd";
 import obyte from "obyte";
 import { useDispatch } from "react-redux";
@@ -27,7 +27,7 @@ export default () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [feedValue, setFeedValue] = useState("");
   const dispatch = useDispatch();
-
+  const deployLink = useRef(null);
   useEffect(() => {
     dispatch(clearBalanceActiveAA());
   }, [dispatch]);
@@ -68,6 +68,13 @@ export default () => {
       setExpiryDate("");
     }
   };
+  const handleKeyDownForm = e => {
+    if (e.keyCode === 13) {
+      if (oracle.valid && expiryDate && feedName && comparison && feedValue) {
+        deployLink.current.click();
+      }
+    }
+  };
   const AA = `{
   base_aa: '${config.base_aa}',
   params: {
@@ -82,7 +89,7 @@ export default () => {
     <Layout title="Deploy" page="deploy">
       <Row>
         <Col xs={{ span: 24 }} md={{ span: 18 }} xl={{ span: 14 }}>
-          <Form>
+          <Form onKeyDown={handleKeyDownForm}>
             <Row className={styles.alertWrap}>
               <Alert
                 message="After the deployment, go to the settings for issue assets"
@@ -185,6 +192,7 @@ export default () => {
                 <Form.Item>
                   <a
                     className="ant-btn ant-btn-lg"
+                    ref={deployLink}
                     disabled={
                       !(
                         oracle.valid &&
