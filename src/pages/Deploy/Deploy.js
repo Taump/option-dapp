@@ -60,7 +60,7 @@ export default () => {
 
   const handleChangeExpiryDate = date => {
     if (date) {
-      let time = date.utc(true).format("YYYY-DD-MM");
+      let time = date.utc(true).format("YYYY-MM-DD");
       // .milliseconds(0);
       // .toISOString();
       setExpiryDate(time);
@@ -69,14 +69,14 @@ export default () => {
     }
   };
   const AA = `{
-base_aa: '${config.base_aa}',
-params: {
-	comparison: '${comparison}', 
-	oracle_address: '${oracle.value}',
-	feed_name: '${feedName}',
-	expiry_date: '${expiryDate}',
-	feed_value: ${toNumericValue(feedValue)}
-	}
+  base_aa: '${config.base_aa}',
+  params: {
+    oracle_address: '${oracle.value}',
+    comparison: '${comparison}', 
+    feed_name: '${feedName}',
+    feed_value: ${toNumericValue(feedValue)},
+    expiry_date: '${expiryDate}'
+  }
 }`;
   return (
     <Layout title="Deploy" page="deploy">
@@ -137,7 +137,7 @@ params: {
                       {"<="}
                     </Option>
                     <Option key="less-6" value="==">
-                      =
+                      ==
                     </Option>
                     <Option key="equals-7" value="!=">
                       !=
@@ -165,7 +165,7 @@ params: {
                     showTime={{
                       defaultValue: moment("00:00:00", "H:mm")
                     }}
-                    format="YYYY-DD-MM"
+                    format="YYYY-MM-DD"
                     placeholder="Expiration date (UTC)"
                     size="large"
                     style={{ width: "100%" }}
