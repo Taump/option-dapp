@@ -4,13 +4,30 @@ import {
   changeActiveAA,
   updateInfoActiveAA,
   watchRequestAas,
-  clearSubscribesAA
+  clearSubscribesAA,
+  subscribeActualAA,
+  getAasByBase,
+  subscribeBaseAA
 } from "../../store/actions/aa";
 import client from "../../socket";
 
 export const UpdateActiveAA = props => {
   const dispatch = useDispatch();
   const aaActive = useSelector(state => state.aa.active);
+
+  useEffect(() => {
+    dispatch(subscribeBaseAA());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const watch = async () => {
+      if (aaActive === null) {
+        await dispatch(getAasByBase());
+        await dispatch(subscribeActualAA());
+      }
+    };
+    watch();
+  }, [dispatch, aaActive]);
 
   useEffect(() => {
     if (aaActive) {
