@@ -82,7 +82,7 @@ export default () => {
       title="Autonomous agent successfully configured"
       extra={
         <Link to="/" className="ant-btn ant-btn-primary ant-btn-lg">
-          Go dashboard
+          Go home page
         </Link>
       }
     />

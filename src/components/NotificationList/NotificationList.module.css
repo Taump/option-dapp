@@ -1,0 +1,12 @@
+.timelineTitle{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 18px;
+    color: #424242;
+}
+
+.timelineLink{
+    color: #383838;
+    font-size: 16px;
+    display: inline-block;
+}

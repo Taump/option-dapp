@@ -1,8 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Form, Input, Select, DatePicker, Alert } from "antd";
+import {
+  Row,
+  Col,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Alert,
+  notification
+} from "antd";
+
 import obyte from "obyte";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { useLocation, useHistory } from "react-router-dom";
 
 import { Layout } from "../../components/Layout/Layout";
 import utils from "../../utils";
@@ -15,19 +26,52 @@ const { Option } = Select;
 const { toNumericValue } = utils;
 
 export default () => {
+  const location = useLocation();
+  let history = useHistory();
+  let params = {};
+
+  if (location.search) {
+    const queryParams = location.search.slice(1).split("&");
+    queryParams.forEach(param => {
+      const p = param.split("=");
+      params[p[0]] = decodeURIComponent(p[1]).slice(0, 64);
+    });
+    if ("oracle" in params) {
+      params.oracle_valid = obyte.utils.isValidAddress(params.oracle);
+    }
+    if ("expire_date" in params) {
+      if (!moment(params.expire_date, "YYYY-MM-DD").isValid()) {
+        notification["error"]({
+          message: "Date expiry is not valid!"
+        });
+        params.valid_date = false;
+      } else {
+        params.valid_date = true;
+      }
+    }
+    if (params.oracle && !params.oracle_valid) {
+      notification["error"]({
+        message: "Oracle address is not valid!"
+      });
+    }
+  }
+
   const [oracle, setOracle] = useState({
-    value: "",
+    value: (params.oracle_valid && params.oracle) || "",
     status: "",
     help: "",
-    valid: false
+    valid: params.oracle_valid || false
   });
 
-  const [feedName, setFeedName] = useState("");
-  const [comparison, setComparison] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [feedValue, setFeedValue] = useState("");
+  const [feedName, setFeedName] = useState(params.feed_name || "");
+  const [comparison, setComparison] = useState(params.comparison || undefined);
+  const [expiryDate, setExpiryDate] = useState(
+    (params.valid_date && moment(params.expire_date)) || undefined
+  );
+  const [feedValue, setFeedValue] = useState(params.feed_value || "");
   const dispatch = useDispatch();
   const deployLink = useRef(null);
+
   useEffect(() => {
     dispatch(clearBalanceActiveAA());
   }, [dispatch]);
@@ -59,11 +103,12 @@ export default () => {
   };
 
   const handleChangeExpiryDate = date => {
-    if (date) {
-      let time = date.utc(true).format("YYYY-MM-DD");
+    if (date && moment(date).isValid()) {
+      // let time = date.utc(true);
+      // .format("YYYY-MM-DD");
       // .milliseconds(0);
       // .toISOString();
-      setExpiryDate(time);
+      setExpiryDate(moment(date));
     } else {
       setExpiryDate("");
     }
@@ -75,6 +120,7 @@ export default () => {
       }
     }
   };
+
   const AA = `{
   base_aa: '${config.base_aa}',
   params: {
@@ -82,9 +128,18 @@ export default () => {
     comparison: '${comparison}', 
     feed_name: '${feedName}',
     feed_value: ${toNumericValue(feedValue)},
-    expiry_date: '${expiryDate}'
+    expiry_date: '${expiryDate &&
+      expiryDate.isValid() &&
+      expiryDate.format("YYYY-MM-DD")}'
   }
 }`;
+
+  useEffect(() => {
+    if (location && location.search) {
+      history.push("/deploy");
+    }
+  });
+
   return (
     <Layout title="Deploy" page="deploy">
       <Row>
@@ -130,6 +185,7 @@ export default () => {
                     className={styles.select}
                     size="large"
                     onChange={handleChangeComparison}
+                    value={comparison}
                   >
                     <Option key="more-1" value=">">
                       >
@@ -175,9 +231,10 @@ export default () => {
                     format="YYYY-MM-DD"
                     placeholder="Expiration date (UTC)"
                     size="large"
-                    style={{ width: "100%" }}
+                    className={styles.datePicker}
                     onChange={handleChangeExpiryDate}
                     allowClear={false}
+                    value={(expiryDate && moment(expiryDate)) || undefined}
                   />
                 </Form.Item>
               </Col>

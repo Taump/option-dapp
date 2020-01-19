@@ -11,7 +11,7 @@ import {
 } from "../../store/actions/aa";
 import client from "../../socket";
 
-export const UpdateActiveAA = props => {
+export const WatcherUpdate = props => {
   const dispatch = useDispatch();
   const aaActive = useSelector(state => state.aa.active);
 

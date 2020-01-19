@@ -1,9 +1,11 @@
 import { Col, DatePicker, Form, Input, Row, Select, Button } from "antd";
-import styles from "../../pages/Deploy/Deploy.module.css";
 import moment from "moment";
 import React, { useState } from "react";
 
+import styles from "../../pages/Deploy/Deploy.module.css";
+
 const { Option } = Select;
+
 export const SearchFormAA = props => {
   const [oracle, setOracle] = useState("");
   const [feedName, setFeedName] = useState("");
@@ -29,7 +31,9 @@ export const SearchFormAA = props => {
 
   const handleChangeExpiryDate = date => {
     if (date) {
-      let time = date.utc(true).format("YYYY-DD-MM");
+      let time = date
+        // utc(true).
+        .format("YYYY-MM-DD");
       // .milliseconds(0);
       // .toISOString();
       setExpiryDate(time);
@@ -122,7 +126,7 @@ export const SearchFormAA = props => {
               showTime={{
                 defaultValue: moment("00:00:00", "H:mm")
               }}
-              format="YYYY-DD-MM"
+              format="YYYY-MM-DD"
               placeholder="Expiration date (UTC)"
               size="large"
               style={{ width: "100%" }}

@@ -1,7 +1,8 @@
 import obyte from "obyte";
+import config from "./config";
 
 const client = new obyte.Client("wss://obyte.org/bb-test", {
-  testnet: true,
+  testnet: config.testnet,
   reconnect: true
 });
 

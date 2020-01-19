@@ -9,15 +9,18 @@ import {
   VIEWED_NOTIFICATION,
   LOADING_NOTIFICATION,
   SUBSCRIBE_AA,
-  CLEAR_SUBSCRIBE_AA
+  CLEAR_SUBSCRIBE_AA,
+  SUBSCRIBE_BASE_AA,
+  ADD_AA_TO_LIST
 } from "../types/aa";
 import { notification } from "antd";
-
+import moment from "moment";
 import client from "../../socket";
 import config from "../../config";
 import utils from "../../utils";
 
 const { createObjectNotification, isAddressByBase } = utils;
+
 export const getAasByBase = () => async dispatch => {
   try {
     await dispatch({
@@ -34,6 +37,7 @@ export const getAasByBase = () => async dispatch => {
     console.log("error", e);
   }
 };
+
 export const changeActiveAA = address => async (dispatch, getState) => {
   try {
     const store = getState();
@@ -86,6 +90,7 @@ export const getBalanceActiveAA = address => async dispatch => {
     console.log("error", e);
   }
 };
+
 const openNotificationRequest = (address, event) => {
   notification.open({
     message: address,
@@ -93,20 +98,30 @@ const openNotificationRequest = (address, event) => {
     style: { minWidth: 350 }
   });
 };
+
 export const watchRequestAas = () => (dispatch, getState) => {
   try {
     client.subscribe(async (err, result) => {
       const store = getState();
       const aaActive = store.aa.active;
       if (result[1].subject === "light/aa_request") {
+        console.log("result", result);
+        const AA = result[1].body.aa_address;
+        const aaVars = await client.api.getAaStateVars({ address: AA });
         if (
           result[1].body &&
-          result[1].body.messages &&
-          result[1].body.messages[0] &&
-          result[1].body.messages[1]
+          result[1].body.aa_address &&
+          result[1].body.unit.messages &&
+          result[1].body.unit.messages[0]
         ) {
-          const notificationObject = createObjectNotification.req(result[1]);
-          if (notificationObject && notificationObject.AA === aaActive) {
+          const notificationObject = createObjectNotification.req(
+            result[1],
+            aaVars
+          );
+          if (
+            (notificationObject && notificationObject.AA === aaActive) ||
+            (!aaActive && notificationObject)
+          ) {
             openNotificationRequest(
               notificationObject.AA,
               notificationObject.title
@@ -129,7 +144,10 @@ export const watchRequestAas = () => (dispatch, getState) => {
             result[1].body,
             aaVars
           );
-          if (notificationObject && notificationObject.AA === aaActive) {
+          if (
+            (notificationObject && notificationObject.AA === aaActive) ||
+            (!aaActive && notificationObject)
+          ) {
             openNotificationRequest(
               notificationObject.AA,
               notificationObject.title
@@ -139,6 +157,35 @@ export const watchRequestAas = () => (dispatch, getState) => {
               payload: notificationObject
             });
           }
+        }
+      } else if (result[1].subject === "light/aa_definition") {
+        console.log("request add AA by base", result);
+        const address =
+          result[1].body.messages[0].payload &&
+          result[1].body.messages[0].payload.address;
+        if (address) {
+          openNotificationRequest(
+            "Deployment Request for New AA",
+            `His address is ${address}`
+          );
+        }
+      } else if (result[1].subject === "light/aa_definition_saved") {
+        console.log("response add AA by base", result);
+        const address =
+          result[1].body.messages[0].payload &&
+          result[1].body.messages[0].payload.address;
+        const definition =
+          result[1].body.messages[0].payload &&
+          result[1].body.messages[0].payload.definition;
+        if (address && definition) {
+          openNotificationRequest(
+            "AA was successfully deployed",
+            `His address is ${address}`
+          );
+          dispatch({
+            type: ADD_AA_TO_LIST,
+            payload: { address, definition }
+          });
         }
       }
     });
@@ -150,9 +197,11 @@ export const watchRequestAas = () => (dispatch, getState) => {
 export const viewedNotification = () => ({
   type: VIEWED_NOTIFICATION
 });
+
 export const clearBalanceActiveAA = () => ({
   type: CLEAR_BALANCE_ACTIVE_AA
 });
+
 export const clearSubscribesAA = () => ({
   type: CLEAR_SUBSCRIBE_AA
 });
@@ -176,13 +225,67 @@ export const getAllNotificationAA = address => async dispatch => {
   });
 };
 
-export const subscribeAA = address => async dispatch => {
-  await client.justsaying("light/new_aa_to_watch", {
-    aa: address
-  });
+export const subscribeAA = address => async (dispatch, getState) => {
+  const store = getState();
+  const subscriptions = store.aa.subscriptions;
+  const isSubscription = subscriptions.filter(aa => aa === address).length > 0;
+  if (!isSubscription) {
+    await client.justsaying("light/new_aa_to_watch", {
+      aa: address
+    });
 
+    await dispatch({
+      type: SUBSCRIBE_AA,
+      payload: address
+    });
+  }
+};
+
+export const subscribeActualAA = () => async (dispatch, getState) => {
+  const store = getState();
+  const { listByBase } = store.aa;
+  if (listByBase) {
+    let notificationsList = [];
+    for (const aa of listByBase) {
+      const params =
+        aa.definition && aa.definition[1] && aa.definition[1].params;
+      const address = aa.address;
+      const { expiry_date } = params;
+      const isValid = moment(expiry_date).isValid();
+      if (isValid) {
+        const expiryDate = moment(expiry_date);
+        const isAfter = expiryDate.isAfter(moment().add(-7, "d"));
+        if (isAfter) {
+          dispatch(subscribeAA(address));
+          const notificationsAA = await client.api.getAaResponses({
+            aa: address
+          });
+          const aaVars = await client.api.getAaStateVars({ address });
+          for (const notification of notificationsAA) {
+            const notificationObject = createObjectNotification.res(
+              notification,
+              aaVars
+            );
+            if (notificationObject) {
+              notificationsList.push(notificationObject);
+            }
+          }
+        }
+      }
+    }
+
+    await dispatch({
+      type: LOADING_NOTIFICATION,
+      payload: notificationsList
+    });
+  }
+};
+
+export const subscribeBaseAA = () => async dispatch => {
+  await client.justsaying("light/new_aa_to_watch", {
+    aa: config.base_aa
+  });
   await dispatch({
-    type: SUBSCRIBE_AA,
-    payload: address
+    type: SUBSCRIBE_BASE_AA
   });
 };

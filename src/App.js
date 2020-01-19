@@ -7,14 +7,13 @@ import Main from "./pages/Main/Main";
 import Deploy from "./pages/Deploy/Deploy";
 import IssuingAssets from "./pages/IssuingAssets/IssuingAssets";
 import Search from "./pages/Search/Search";
-import { UpdateActiveAA } from "./components/UpdateActiveAA/UpdateActiveAA";
-import Notifications from "./pages/Notifications/Notifications";
+import { WatcherUpdate } from "./components/WatcherUpdate/WatcherUpdate";
 import { InnerRoute } from "./components/InnerRoute/InnerRoute";
 
 const App = () => {
   return (
     <Provider store={store}>
-      <UpdateActiveAA>
+      <WatcherUpdate>
         <Router>
           <Route exact path="/">
             <InnerRoute>
@@ -30,11 +29,8 @@ const App = () => {
           <Route exact path="/issuing_assets">
             <IssuingAssets />
           </Route>
-          <Route exact path="/notifications">
-            <Notifications />
-          </Route>
         </Router>
-      </UpdateActiveAA>
+      </WatcherUpdate>
     </Provider>
   );
 };

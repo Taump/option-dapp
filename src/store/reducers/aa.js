@@ -9,13 +9,16 @@ import {
   VIEWED_NOTIFICATION,
   LOADING_NOTIFICATION,
   SUBSCRIBE_AA,
-  CLEAR_SUBSCRIBE_AA
+  CLEAR_SUBSCRIBE_AA,
+  SUBSCRIBE_BASE_AA,
+  ADD_AA_TO_LIST
 } from "../types/aa";
 
 const initialState = {
   listByBase: [],
   listByBaseLoaded: [],
   subscriptions: [],
+  subscribeBase: false,
   active: null,
   activeInfo: null,
   activeBalance: {
@@ -23,7 +26,6 @@ const initialState = {
   },
   activeAssetsRequest: {},
   notifications: [],
-  isViewedNotifications: true,
   error: null
 };
 
@@ -84,6 +86,12 @@ export const aaReducer = (state = initialState, action) => {
         listByBaseLoaded: true
       };
     }
+    case ADD_AA_TO_LIST: {
+      return {
+        ...state,
+        listByBase: [...state.listByBase, action.payload]
+      };
+    }
     case ADD_AA_NOTIFICATION: {
       if (action.payload.AA === state.active) {
         let assets = {};
@@ -128,6 +136,12 @@ export const aaReducer = (state = initialState, action) => {
       return {
         ...state,
         subscriptions: []
+      };
+    }
+    case SUBSCRIBE_BASE_AA: {
+      return {
+        ...state,
+        subscribeBase: true
       };
     }
     default:

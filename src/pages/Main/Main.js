@@ -13,14 +13,18 @@ import { useSelector, useDispatch } from "react-redux";
 import obyte from "obyte";
 import base64url from "base64url";
 import { useLocation, useHistory } from "react-router-dom";
+
 import { Layout } from "../../components/Layout/Layout";
 import { getBalanceActiveAA, updateInfoActiveAA } from "../../store/actions/aa";
 import { SelectAA } from "../../components/SelectAA/SelectAA";
+import NotificationList from "../../components/NotificationList/NotificationList";
+
 import config from "./../../config";
 import styles from "../Main/Main.module.css";
+
 const { Title } = Typography;
 
-export default props => {
+export default () => {
   let location = useLocation();
   let history = useHistory();
   useEffect(() => {
@@ -140,8 +144,9 @@ export default props => {
       }
     }
   };
+
   return (
-    <Layout title="Dashboard" page="dashboard">
+    <Layout title="Home" page="home">
       <Form>
         <Row className={styles.SelectAaRow}>
           <Col xs={{ span: 24 }} md={{ span: 12 }}>
@@ -167,9 +172,9 @@ export default props => {
       {aaActive && (
         <Row>
           <Col xs={{ span: 24 }} md={{ span: 10 }}>
-            <Title level={2}>Investment</Title>
             <Form>
-              <Row>
+              <Title level={2}>Investment</Title>
+              <Row style={{ marginBottom: 30 }}>
                 <Col xs={{ span: 24 }} lg={{ span: 16 }}>
                   <Form.Item
                     hasFeedback
@@ -206,110 +211,113 @@ export default props => {
                 </Col>
               </Row>
             </Form>
+            <Row>
+              <Title level={2}>Redemption</Title>
+              <Form>
+                <Row>
+                  <Col xs={{ span: 24 }} lg={{ span: 16 }}>
+                    <Form.Item
+                      hasFeedback
+                      validateStatus={statusAddress.status}
+                      help={statusAddress.help}
+                    >
+                      <Input
+                        placeholder="Your address"
+                        onChange={handleChangeAddress}
+                        value={statusAddress.value}
+                        style={{ width: "100%" }}
+                        min={100000}
+                        size="large"
+                        onKeyPress={target => {
+                          if (target.key === "Enter") {
+                            if (statusAddress.valid && !!aaActive) {
+                              handleClick();
+                            }
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={{ span: 24, push: 0 }} lg={{ span: 7, push: 1 }}>
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        size="large"
+                        disabled={!(statusAddress.valid && !!aaActive)}
+                        onClick={handleClick}
+                      >
+                        Search
+                      </Button>
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row>
+                  {statusAddress.valid && aaActiveBalance.loading && (
+                    <div className={styles.activeBalance}>
+                      <Row>
+                        <b>winner: </b>
+                        {aaActiveInfo.winner
+                          ? aaActiveInfo.winner + "_asset"
+                          : "the winner has not yet been chosen"}
+                      </Row>
+                      <Row>
+                        <b>no_asset: </b>
+                        {aaActiveInfo.no_asset
+                          ? aaActiveInfo.no_asset
+                          : "yes_asset has not been created"}
+                      </Row>
+                      <Row>
+                        <b>yes_asset: </b>
+                        {aaActiveInfo.yes_asset
+                          ? aaActiveInfo.yes_asset
+                          : "yes_asset has not been created"}
+                      </Row>
+                      <Row>
+                        <b>your balance of yes_asset: </b>
+                        {aaActiveBalance.yes_asset
+                          ? aaActiveBalance.yes_asset
+                          : "0"}
+                      </Row>
+                      <Row>
+                        <b>your balance of no_asset: </b>
+                        {aaActiveBalance.no_asset
+                          ? aaActiveBalance.no_asset
+                          : "0"}
+                      </Row>
+                      <Row style={{ marginTop: 15 }}>
+                        {aaActiveInfo.winner &&
+                          aaActiveBalance[aaActiveInfo.winner + "_asset"] >
+                            0 && (
+                            <a
+                              type="primary"
+                              href={`byteball${
+                                config.testnet ? "-tn" : ""
+                              }:${aaActive}?amount=${
+                                aaActiveBalance[aaActiveInfo.winner + "_asset"]
+                              }&amp;&asset=${encodeURIComponent(
+                                aaActiveInfo[aaActiveInfo.winner + "_asset"]
+                              )}`}
+                              className="ant-btn ant-btn-lg"
+                            >
+                              Exchange for bytes
+                            </a>
+                          )}
+                      </Row>
+                    </div>
+                  )}
+                </Row>
+              </Form>
+            </Row>
           </Col>
           <Col xs={{ span: 24 }} md={{ span: 12, push: 2 }}>
-            <Title level={2}>Redemption</Title>
-            <Form>
-              <Row>
-                <Col xs={{ span: 24 }} lg={{ span: 16 }}>
-                  <Form.Item
-                    hasFeedback
-                    validateStatus={statusAddress.status}
-                    help={statusAddress.help}
-                  >
-                    <Input
-                      placeholder="Your address"
-                      onChange={handleChangeAddress}
-                      value={statusAddress.value}
-                      style={{ width: "100%" }}
-                      min={100000}
-                      size="large"
-                      onKeyPress={target => {
-                        if (target.key === "Enter") {
-                          if (statusAddress.valid && !!aaActive) {
-                            handleClick();
-                          }
-                        }
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={{ span: 24, push: 0 }} lg={{ span: 7, push: 1 }}>
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      size="large"
-                      disabled={!(statusAddress.valid && !!aaActive)}
-                      onClick={handleClick}
-                    >
-                      Search
-                    </Button>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                {statusAddress.valid && aaActiveBalance.loading && (
-                  <div
-                    style={{
-                      backgroundColor: "#F0F2F5",
-                      wordBreak: "break-all",
-                      padding: 25,
-                      borderRadius: 5,
-                      fontSize: 18
-                    }}
-                  >
-                    <Row>
-                      <b>winner: </b>
-                      {aaActiveInfo.winner
-                        ? aaActiveInfo.winner + "_asset"
-                        : "the winner has not yet been chosen"}
-                    </Row>
-                    <Row>
-                      <b>no_asset: </b>
-                      {aaActiveInfo.no_asset
-                        ? aaActiveInfo.no_asset
-                        : "yes_asset has not been created"}
-                    </Row>
-                    <Row>
-                      <b>yes_asset: </b>
-                      {aaActiveInfo.yes_asset
-                        ? aaActiveInfo.yes_asset
-                        : "yes_asset has not been created"}
-                    </Row>
-                    <Row>
-                      <b>your balance of yes_asset: </b>
-                      {aaActiveBalance.yes_asset
-                        ? aaActiveBalance.yes_asset
-                        : "0"}
-                    </Row>
-                    <Row>
-                      <b>your balance of no_asset: </b>
-                      {aaActiveBalance.no_asset
-                        ? aaActiveBalance.no_asset
-                        : "0"}
-                    </Row>
-                    <Row style={{ marginTop: 15 }}>
-                      {aaActiveInfo.winner &&
-                        aaActiveBalance[aaActiveInfo.winner + "_asset"] > 0 && (
-                          <a
-                            type="primary"
-                            href={`byteball${
-                              config.testnet ? "-tn" : ""
-                            }:${aaActive}?amount=${
-                              aaActiveBalance[aaActiveInfo.winner + "_asset"]
-                            }&amp;&asset=${encodeURIComponent(
-                              aaActiveInfo[aaActiveInfo.winner + "_asset"]
-                            )}`}
-                            className="ant-btn ant-btn-lg"
-                          >
-                            Exchange for bytes
-                          </a>
-                        )}
-                    </Row>
-                  </div>
-                )}
-              </Row>
-            </Form>
+            <NotificationList isFull={false} />
+          </Col>
+        </Row>
+      )}
+      {!aaActive && (
+        <Row>
+          <Col xs={{ span: 24 }} md={{ span: 24 }}>
+            <NotificationList />
           </Col>
         </Row>
       )}

@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Table, Popover, Row } from "antd";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Layout } from "../../components/Layout/Layout";
-import { changeActiveAA, getAasByBase } from "../../store/actions/aa";
-import { useWindowSize } from "../../hooks/useWindowSize";
 import { truncate } from "lodash";
+
+import { Layout } from "../../components/Layout/Layout";
+import { changeActiveAA } from "../../store/actions/aa";
+import { useWindowSize } from "../../hooks/useWindowSize";
 import { SearchFormAA } from "../../components/SearchFormAA/SearchFormAA";
+
 import styles from "./Search.module.css";
+
 export default () => {
   const aaListByBase = useSelector(state => state.aa.listByBase);
   const listByBaseLoaded = useSelector(state => state.aa.listByBaseLoaded);
   const dispatch = useDispatch();
   let history = useHistory();
-  useEffect(() => {
-    dispatch(getAasByBase());
-  }, [dispatch]);
 
   const dataSource = [];
   aaListByBase.forEach(aa => {
@@ -196,10 +196,6 @@ export default () => {
                   handleChangeAA(aa.address);
                 }}
               >
-                {/*<div>*/}
-                {/*  {aa.feed_name} {aa.comparison} {aa.feed_value} on{" "}*/}
-                {/*  {aa.expiry_date} ({aa.address})*/}
-                {/*</div>*/}
                 <div>
                   <b>Address:</b> {aa.address}
                 </div>

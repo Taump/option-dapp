@@ -2,7 +2,8 @@ import React from "react";
 import { Select } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { truncate } from "lodash";
-import { changeActiveAA, getAasByBase } from "../../store/actions/aa";
+import { changeActiveAA } from "../../store/actions/aa";
+
 import styles from "../SelectAA/SelectAA.module.css";
 
 const { Option } = Select;
@@ -26,7 +27,6 @@ export const SelectAA = props => {
       size="large"
       loading={!listByBaseLoaded}
       showSearch={true}
-      onDropdownVisibleChange={() => dispatch(getAasByBase())}
       {...props}
     >
       <Option key={"AA0"} value={0} disabled>

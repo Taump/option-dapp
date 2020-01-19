@@ -1,14 +1,13 @@
 import React from "react";
 import { Layout, Menu, Icon } from "antd";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import styles from "../Sidebar/Sidebar.module.css";
 
 const { Sider } = Layout;
 
 const dataMenu = [
-  { key: "dashboard", icon: "control", title: "Dashboard", path: "/" },
+  { key: "home", icon: "home", title: "Home", path: "/" },
   { key: "deploy", icon: "plus-circle", title: "Deploy AA", path: "/deploy" },
   {
     key: "search",
@@ -21,19 +20,10 @@ const dataMenu = [
     icon: "setting",
     title: "Issuing assets",
     path: "/issuing_assets"
-  },
-  {
-    key: "notifications",
-    icon: "bell",
-    title: "Notifications",
-    path: "/notifications"
   }
 ];
 
 export const Sidebar = ({ active }) => {
-  const isViewedNotifications = useSelector(
-    state => state.aa.isViewedNotifications
-  );
   return (
     <Sider breakpoint="lg" collapsedWidth="0" className={styles.sider}>
       <div className={styles.logo}>
@@ -47,15 +37,7 @@ export const Sidebar = ({ active }) => {
           return (
             <Menu.Item key={item.key}>
               <NavLink to={item.path} activeClassName="selected">
-                <Icon
-                  type={item.icon}
-                  theme={item.key === "notifications" ? "filled" : "outlined"}
-                  style={
-                    item.key === "notifications" && !isViewedNotifications
-                      ? { color: "red" }
-                      : { color: "ccc" }
-                  }
-                />
+                <Icon type={item.icon} />
                 <span className="nav-text">{item.title}</span>
               </NavLink>
             </Menu.Item>
