@@ -1,8 +1,17 @@
 .timelineTitle{
-    padding-top: 20px;
-    padding-bottom: 20px;
-    font-size: 18px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 20px;
     color: #424242;
+    word-break: break-all;
+    cursor: pointer;
+    display: inline-block;
+    transition: .5s;
+}
+
+.timelineTitle:hover{
+    color: #1890ff;
+    transition: .5s;
 }
 
 .timelineLink{

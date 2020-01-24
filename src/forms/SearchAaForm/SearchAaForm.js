@@ -2,11 +2,11 @@ import { Col, DatePicker, Form, Input, Row, Select, Button } from "antd";
 import moment from "moment";
 import React, { useState } from "react";
 
-import styles from "../../pages/Deploy/Deploy.module.css";
+import styles from "../SearchAaForm/SearchAaFrom.module.css";
 
 const { Option } = Select;
 
-export const SearchFormAA = props => {
+export const SearchAaForm = props => {
   const [oracle, setOracle] = useState("");
   const [feedName, setFeedName] = useState("");
   const [comparison, setComparison] = useState("");

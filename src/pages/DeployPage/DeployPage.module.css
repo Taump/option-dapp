@@ -1,0 +1,12 @@
+.input,
+.select {
+    width: 100%;
+}
+
+.alertWrap {
+    margin-bottom: 20px;
+}
+
+.datePicker{
+    width: 100%;
+}

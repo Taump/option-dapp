@@ -1,13 +1,16 @@
 import React from "react";
 import { Typography, Skeleton, BackTop, Timeline, Icon } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
 import { groupBy } from "lodash";
 
+import utils from "../../utils";
 import config from "../../config";
 import styles from "./NotificationList.module.css";
+import { changeActiveAA } from "../../store/actions/aa";
 
 const { Title } = Typography;
+const { createStringDescrForAa } = utils;
 
 const reducer = (accumulator, currentValue) => {
   if (currentValue.time > accumulator) {
@@ -19,13 +22,17 @@ const reducer = (accumulator, currentValue) => {
 
 const NotificationList = ({ isFull = true }) => {
   let addressSortByLastTime = [];
-  const notifications = useSelector(state => state.aa.notifications);
+  const notifications = useSelector(state =>
+    isFull ? state.aa.fullNotifications : state.aa.notifications
+  );
+  const listByBase = useSelector(state => state.aa.listByBase);
+  const dispatch = useDispatch();
   const notificationsGroup = groupBy(notifications, "AA");
 
   if (notifications.length === 0 && isFull) {
     return (
       <div>
-        <Title level={2}>Events list AA</Title>
+        <Title level={2}>Recent events</Title>
         <Skeleton row={10} paragraph={{ rows: 10, width: 0 }} active={true} />
       </div>
     );
@@ -45,7 +52,7 @@ const NotificationList = ({ isFull = true }) => {
 
   return (
     <div>
-      <Title level={2}>Events list AA</Title>
+      <Title level={2}>Recent events</Title>
       {notifications.length === 0 && <div>Events not found</div>}
       {addressSortByLastTime.map(objectKey => {
         const notifications = isFull
@@ -70,7 +77,7 @@ const NotificationList = ({ isFull = true }) => {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href={`http://${config.testnet &&
+                href={`https://${config.testnet &&
                   "testnet"}explorer.obyte.org#${n.trigger_unit}`}
                 className={styles.timelineLink}
               >
@@ -82,9 +89,28 @@ const NotificationList = ({ isFull = true }) => {
             </Timeline.Item>
           );
         });
+        const currentAaObject = listByBase.find(aa => aa.address === objectKey);
+        const currentAaParams = currentAaObject.definition[1].params;
+        const titleAa = createStringDescrForAa(
+          currentAaObject.address,
+          currentAaParams.feed_name,
+          currentAaParams.comparison,
+          currentAaParams.expiry_date,
+          currentAaParams.feed_value
+        );
+
         return (
           <Timeline key={"timeline-" + objectKey}>
-            {isFull && <div className={styles.timelineTitle}>{objectKey}</div>}
+            {isFull && (
+              <div
+                className={styles.timelineTitle}
+                onClick={() =>
+                  dispatch(changeActiveAA(currentAaObject.address))
+                }
+              >
+                {titleAa}
+              </div>
+            )}
             {timeline}
             {isSlice && isFull && (
               <Timeline.Item dot={<Icon type="small-dash" />} color="black" />

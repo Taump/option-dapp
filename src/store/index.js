@@ -1,9 +1,11 @@
 import { createStore, applyMiddleware, combineReducers, compose } from "redux";
 import thunk from "redux-thunk";
 import { aaReducer } from "./reducers/aa";
+import { deployReducer } from "./reducers/deploy";
 
 const rootReducer = combineReducers({
-  aa: aaReducer
+  aa: aaReducer,
+  deploy: deployReducer
 });
 
 export default createStore(

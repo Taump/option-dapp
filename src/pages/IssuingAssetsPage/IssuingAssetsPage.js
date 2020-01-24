@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Layout } from "../../components/Layout/Layout";
 import { SelectAA } from "../../components/SelectAA/SelectAA";
 
-import styles from "./IssuingAssets.module.css";
+import styles from "./IssuingAssetsPage.module.css";
 import config from "./../../config";
 
 const { Step } = Steps;
@@ -44,7 +44,7 @@ export default () => {
     <Result
       icon={<Icon type="loading" />}
       title="Issue yes_asset"
-      subTitle="Once the asset is stable, you will go to the next step"
+      subTitle="As soon as we receive a request to issue an asset, you will proceed to the next step"
       extra={
         <a
           href={`byteball${
@@ -62,7 +62,7 @@ export default () => {
     <Result
       icon={<Icon type="loading" />}
       title="Issue no_asset"
-      subTitle="Once the asset is stable, you will go to the next step"
+      subTitle="As soon as we receive a request to issue an asset, you will proceed to the next step"
       extra={
         <a
           href={`byteball${

@@ -1,33 +1,37 @@
 import React from "react";
 import { Provider } from "react-redux";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import "antd/dist/antd.css";
+import { Router, Route } from "react-router-dom";
+
 import store from "./store";
-import Main from "./pages/Main/Main";
-import Deploy from "./pages/Deploy/Deploy";
-import IssuingAssets from "./pages/IssuingAssets/IssuingAssets";
-import Search from "./pages/Search/Search";
+
+import "antd/dist/antd.css";
+
+import MainPage from "./pages/MainPage/MainPage";
+import DeployPage from "./pages/DeployPage/DeployPage";
+import IssuingAssetsPage from "./pages/IssuingAssetsPage/IssuingAssetsPage";
+import SearchPage from "./pages/SearchPage/SearchPage";
+
 import { WatcherUpdate } from "./components/WatcherUpdate/WatcherUpdate";
 import { InnerRoute } from "./components/InnerRoute/InnerRoute";
-
+import history from "./history";
 const App = () => {
   return (
     <Provider store={store}>
       <WatcherUpdate>
-        <Router>
+        <Router history={history}>
           <Route exact path="/">
             <InnerRoute>
-              <Main />
+              <MainPage />
             </InnerRoute>
           </Route>
           <Route exact path="/deploy">
-            <Deploy />
+            <DeployPage />
           </Route>
           <Route exact path="/search">
-            <Search />
+            <SearchPage />
           </Route>
           <Route exact path="/issuing_assets">
-            <IssuingAssets />
+            <IssuingAssetsPage />
           </Route>
         </Router>
       </WatcherUpdate>

@@ -7,9 +7,9 @@ import { truncate } from "lodash";
 import { Layout } from "../../components/Layout/Layout";
 import { changeActiveAA } from "../../store/actions/aa";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import { SearchFormAA } from "../../components/SearchFormAA/SearchFormAA";
+import { SearchAaForm } from "../../forms";
 
-import styles from "./Search.module.css";
+import styles from "./SearchPage.module.css";
 
 export default () => {
   const aaListByBase = useSelector(state => state.aa.listByBase);
@@ -167,7 +167,7 @@ export default () => {
   return (
     <Layout title="Search AA" page="search">
       <Row>
-        <SearchFormAA handleChangeSearchFormAA={handleChangeSearchFormAA} />
+        <SearchAaForm handleChangeSearchFormAA={handleChangeSearchFormAA} />
       </Row>
       {width >= 900 && (
         <Table

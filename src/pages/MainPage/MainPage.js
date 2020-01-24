@@ -20,7 +20,7 @@ import { SelectAA } from "../../components/SelectAA/SelectAA";
 import NotificationList from "../../components/NotificationList/NotificationList";
 
 import config from "./../../config";
-import styles from "../Main/Main.module.css";
+import styles from "./MainPage.module.css";
 
 const { Title } = Typography;
 

@@ -11,7 +11,9 @@ import {
   SUBSCRIBE_AA,
   CLEAR_SUBSCRIBE_AA,
   SUBSCRIBE_BASE_AA,
-  ADD_AA_TO_LIST
+  ADD_AA_TO_LIST,
+  LOADING_NOTIFICATION_REQUEST,
+  LOADING_FULL_NOTIFICATION
 } from "../types/aa";
 
 const initialState = {
@@ -26,6 +28,8 @@ const initialState = {
   },
   activeAssetsRequest: {},
   notifications: [],
+  fullNotifications: [],
+  notificationsLoaded: false,
   error: null
 };
 
@@ -35,7 +39,7 @@ export const aaReducer = (state = initialState, action) => {
       return {
         ...state,
         active: action.payload.address,
-        activeInfo: action.payload.aaVars,
+        activeInfo: action.payload.aaVars || null,
         activeBalance: {
           loading: false
         },
@@ -87,29 +91,40 @@ export const aaReducer = (state = initialState, action) => {
       };
     }
     case ADD_AA_TO_LIST: {
+      const newListByBase = state.listByBase.filter(
+        aa => aa.address !== action.payload.address
+      );
       return {
         ...state,
-        listByBase: [...state.listByBase, action.payload]
+        listByBase: [...newListByBase, action.payload]
       };
     }
     case ADD_AA_NOTIFICATION: {
-      if (action.payload.AA === state.active) {
-        let assets = {};
-        if (action.payload.tag === "req_yes") {
-          assets.yes_asset = true;
-        } else if (action.payload.tag === "req_no") {
-          assets.no_asset = true;
+      if (state.active) {
+        if (action.payload.AA === state.active) {
+          let assets = {};
+          if (action.payload.tag === "req_yes") {
+            assets.yes_asset = true;
+          } else if (action.payload.tag === "req_no") {
+            assets.no_asset = true;
+          }
+          return {
+            ...state,
+            notifications: [action.payload, ...state.notifications],
+            activeAssetsRequest: { ...state.activeAssetsRequest, ...assets },
+            isViewedNotifications: false
+          };
+        } else {
+          return {
+            ...state,
+            notifications: [action.payload, ...state.notifications],
+            isViewedNotifications: false
+          };
         }
-        return {
-          ...state,
-          notifications: [action.payload, ...state.notifications],
-          activeAssetsRequest: { ...state.activeAssetsRequest, ...assets },
-          isViewedNotifications: false
-        };
       } else {
         return {
           ...state,
-          notifications: [action.payload, ...state.notifications],
+          fullNotifications: [action.payload, ...state.fullNotifications],
           isViewedNotifications: false
         };
       }
@@ -123,7 +138,21 @@ export const aaReducer = (state = initialState, action) => {
     case LOADING_NOTIFICATION: {
       return {
         ...state,
-        notifications: action.payload
+        notifications: action.payload,
+        notificationsLoaded: true
+      };
+    }
+    case LOADING_FULL_NOTIFICATION: {
+      return {
+        ...state,
+        fullNotifications: action.payload
+      };
+    }
+
+    case LOADING_NOTIFICATION_REQUEST: {
+      return {
+        ...state,
+        notificationsLoaded: false
       };
     }
     case SUBSCRIBE_AA: {

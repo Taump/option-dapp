@@ -1,9 +1,13 @@
-const toNumericValue = value => {
+const toNumericValue = (value, quotes = true) => {
   const t = /^-{0,1}\d+$/.test(value);
   if (t && value <= Number.MAX_SAFE_INTEGER) {
-    return value;
+    return Number(value);
   } else {
-    return `'${value}'`;
+    if (quotes) {
+      return `'${value}'`;
+    } else {
+      return `${value}`;
+    }
   }
 };
 
