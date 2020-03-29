@@ -14,6 +14,7 @@ const { Option } = Select;
 const { toNumericValue } = utils;
 
 export const DeployAaForm = ({ params }) => {
+  const StringDateNow = moment().format("YYYY-MM-DD");
   const [oracle, setOracle] = useState({
     value: (params.oracle_valid && params.oracle) || "",
     status: "",
@@ -23,7 +24,11 @@ export const DeployAaForm = ({ params }) => {
   const [feedName, setFeedName] = useState(params.feed_name || "");
   const [comparison, setComparison] = useState(params.comparison || undefined);
   const [expiryDate, setExpiryDate] = useState(
-    (params.valid_date && moment(params.expire_date)) || undefined
+    params.valid_date &&
+      moment(params.expire_date).isValid() &&
+      moment(StringDateNow).isSameOrBefore(params.expire_date)
+      ? { value: moment(params.expire_date), valid: true, help: "" }
+      : { value: undefined, valid: false, help: "" }
   );
   const [feedValue, setFeedValue] = useState(params.feed_value || "");
   // const [redirect, setRedirect] = useState(false);
@@ -67,9 +72,18 @@ export const DeployAaForm = ({ params }) => {
       // .format("YYYY-MM-DD");
       // .milliseconds(0);
       // .toISOString();
-      setExpiryDate(moment(date));
+
+      if (moment(StringDateNow).isSameOrBefore(date)) {
+        setExpiryDate({ value: moment(date), help: "", valid: true });
+      } else {
+        setExpiryDate({
+          value: moment(date),
+          help: "This date has already passed",
+          valid: false
+        });
+      }
     } else {
-      setExpiryDate("");
+      setExpiryDate({ value: undefined, help: "", valid: false });
     }
   };
   const handleKeyDownForm = e => {
@@ -88,8 +102,8 @@ export const DeployAaForm = ({ params }) => {
     feed_name: '${feedName}',
     feed_value: ${toNumericValue(feedValue)},
     expiry_date: '${expiryDate &&
-      expiryDate.isValid() &&
-      expiryDate.format("YYYY-MM-DD")}'
+      expiryDate.valid &&
+      expiryDate.value.format("YYYY-MM-DD")}'
   }
 }`;
   const handleClickDeploy = () => {
@@ -184,10 +198,14 @@ export const DeployAaForm = ({ params }) => {
       </Row>
       <Row>
         <Col xs={{ span: 24 }} sm={{ span: 16 }} md={{ span: 12 }}>
-          <Form.Item>
+          <Form.Item
+            hasFeedback
+            help={expiryDate.help}
+            validateStatus={expiryDate.help && "error"}
+          >
             <DatePicker
               showTime={{
-                defaultValue: moment("00:00:00", "H:mm")
+                defaultValue: moment("00 00 00", "H mm ss")
               }}
               format="YYYY-MM-DD"
               placeholder="Expiration date (UTC)"
@@ -195,7 +213,9 @@ export const DeployAaForm = ({ params }) => {
               className={styles.datePicker}
               onChange={handleChangeExpiryDate}
               allowClear={false}
-              value={(expiryDate && moment(expiryDate)) || undefined}
+              value={
+                (expiryDate.value && moment(expiryDate.value)) || undefined
+              }
             />
           </Form.Item>
         </Col>
@@ -215,17 +235,17 @@ export const DeployAaForm = ({ params }) => {
               disabled={
                 !(
                   oracle.valid &&
-                  expiryDate &&
+                  expiryDate.valid &&
                   feedName &&
                   comparison &&
                   feedValue
                 )
               }
-              href={`byteball${
+              href={`obyte${
                 config.testnet ? "-tn" : ""
               }:data?app=definition&definition=${encodeURIComponent(AA)}`}
             >
-              Open deploy screen
+              Deploy from Obyte wallet
             </a>
           </Form.Item>
         </Col>

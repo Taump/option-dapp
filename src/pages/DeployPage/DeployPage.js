@@ -60,7 +60,29 @@ export default () => {
   // }, [wasIssued, history, deployAaPrams]);
 
   return (
-    <Layout title="Deploy" page="deploy">
+    <Layout title="Create a new prediction market" page="deploy">
+      <Row>
+        <p>
+          Create a market for a future event that has only two resolutions: Yes
+          and No.
+        </p>
+        <p>
+          Examples: Will Chelsea win in their next play against Liverpool? Will
+          Trump be re-elected in 2020 US presidential elections? Will BTC go
+          over $20,000 before the end of 2020?
+        </p>
+        <p>
+          Indicate below the conditions for Yes answer to win. The outcome
+          should be posted by an oracle in a specific data feed, for example,
+          for BTC to go over $20,000, the price oracle should post a data feed
+          BTC_USD greater than 20000.
+        </p>
+        <p>
+          After you create the market, you’ll also issue Yes and No assets that
+          represent the two outcomes of the event. Users will be able to trade
+          these assets to make bets on either outcome.
+        </p>
+      </Row>
       <Row>
         <Col span={24}>
           {!pending ? (
@@ -68,7 +90,7 @@ export default () => {
           ) : (
             <Result
               icon={<Icon type="loading" />}
-              title="We are waiting for your deployment request"
+              title="Waiting for your deployment request"
               subTitle="After that, you will be redirected to the asset issue page"
               extra={
                 <Button

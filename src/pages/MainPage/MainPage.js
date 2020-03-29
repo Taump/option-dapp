@@ -146,7 +146,7 @@ export default () => {
   };
 
   return (
-    <Layout title="Home" page="home">
+    <Layout title="Prediction markets" page="home">
       <Form>
         <Row className={styles.SelectAaRow}>
           <Col xs={{ span: 24 }} md={{ span: 12 }}>
@@ -174,6 +174,11 @@ export default () => {
           <Col xs={{ span: 24 }} md={{ span: 10 }}>
             <Form>
               <Title level={2}>Investment</Title>
+              <p>
+                Send Bytes and receive both Yes and No assets in exchange. Then,
+                you’ll be able to sell one of the assets and keep the one you
+                want to bet on.
+              </p>
               <Row style={{ marginBottom: 30 }}>
                 <Col xs={{ span: 24 }} lg={{ span: 16 }}>
                   <Form.Item
@@ -197,7 +202,7 @@ export default () => {
                     <a
                       type="primary"
                       disabled={!(statusAmount.valid && !!aaActive)}
-                      href={`byteball${
+                      href={`obyte${
                         config.testnet ? "-tn" : ""
                       }:${aaActive}?amount=${
                         statusAmount.value
@@ -205,7 +210,7 @@ export default () => {
                       className="ant-btn ant-btn-primary ant-btn-lg"
                       ref={investmentLink}
                     >
-                      Next
+                      Send
                     </a>
                   </Form.Item>
                 </Col>
@@ -213,6 +218,7 @@ export default () => {
             </Form>
             <Row>
               <Title level={2}>Redemption</Title>
+              <p>Redeem the winning asset (Yes or No) for Bytes</p>
               <Form>
                 <Row>
                   <Col xs={{ span: 24 }} lg={{ span: 16 }}>
@@ -255,31 +261,31 @@ export default () => {
                   {statusAddress.valid && aaActiveBalance.loading && (
                     <div className={styles.activeBalance}>
                       <Row>
-                        <b>winner: </b>
+                        <b>Winner: </b>
                         {aaActiveInfo.winner
                           ? aaActiveInfo.winner + "_asset"
-                          : "the winner has not yet been chosen"}
+                          : "The winner is not known yet"}
                       </Row>
                       <Row>
-                        <b>no_asset: </b>
+                        <b>No asset: </b>
                         {aaActiveInfo.no_asset
                           ? aaActiveInfo.no_asset
-                          : "yes_asset has not been created"}
+                          : "No asset has not been created"}
                       </Row>
                       <Row>
-                        <b>yes_asset: </b>
+                        <b>Yes asset: </b>
                         {aaActiveInfo.yes_asset
                           ? aaActiveInfo.yes_asset
-                          : "yes_asset has not been created"}
+                          : "Yes asset has not been created"}
                       </Row>
                       <Row>
-                        <b>your balance of yes_asset: </b>
+                        <b>your balance of Yes asset: </b>
                         {aaActiveBalance.yes_asset
                           ? aaActiveBalance.yes_asset
                           : "0"}
                       </Row>
                       <Row>
-                        <b>your balance of no_asset: </b>
+                        <b>your balance of No asset: </b>
                         {aaActiveBalance.no_asset
                           ? aaActiveBalance.no_asset
                           : "0"}
@@ -290,7 +296,7 @@ export default () => {
                             0 && (
                             <a
                               type="primary"
-                              href={`byteball${
+                              href={`obyte${
                                 config.testnet ? "-tn" : ""
                               }:${aaActive}?amount=${
                                 aaActiveBalance[aaActiveInfo.winner + "_asset"]
@@ -324,26 +330,26 @@ export default () => {
       <Modal
         visible={visibleWinnerModal}
         footer={null}
-        title="Choose a winner"
+        title="Post the outcome of the market. This outcome must be already confirmed by the oracle."
         onCancel={() => setVisibleWinnerModal(false)}
       >
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <a
-            href={`byteball${
+            href={`obyte${
               config.testnet ? "-tn" : ""
             }:${aaActive}?amount=10000&base64data=${dataWinnerYesBase64}`}
             className="ant-btn ant-btn-primary ant-btn-lg"
           >
-            yes_asset
+            “Yes” outcome won
           </a>
 
           <a
-            href={`byteball${
+            href={`obyte${
               config.testnet ? "-tn" : ""
             }:${aaActive}?amount=10000&base64data=${dataWinnerNoBase64}`}
             className="ant-btn ant-btn-primary ant-btn-lg"
           >
-            no_asset
+            “No” outcome won
           </a>
         </div>
       </Modal>

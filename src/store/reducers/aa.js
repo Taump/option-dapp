@@ -13,10 +13,13 @@ import {
   SUBSCRIBE_BASE_AA,
   ADD_AA_TO_LIST,
   LOADING_NOTIFICATION_REQUEST,
-  LOADING_FULL_NOTIFICATION
+  LOADING_FULL_NOTIFICATION,
+  OPEN_NETWORK,
+  CLOSE_NETWORK
 } from "../types/aa";
 
 const initialState = {
+  network: true,
   listByBase: [],
   listByBaseLoaded: [],
   subscriptions: [],
@@ -35,6 +38,18 @@ const initialState = {
 
 export const aaReducer = (state = initialState, action) => {
   switch (action.type) {
+    case OPEN_NETWORK: {
+      return {
+        ...state,
+        network: true
+      };
+    }
+    case CLOSE_NETWORK: {
+      return {
+        ...state,
+        network: false
+      };
+    }
     case CHANGE_ACTIVE_AA: {
       return {
         ...state,

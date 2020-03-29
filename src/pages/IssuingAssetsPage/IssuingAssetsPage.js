@@ -43,11 +43,11 @@ export default () => {
   currentBlock[0] = (
     <Result
       icon={<Icon type="loading" />}
-      title="Issue yes_asset"
-      subTitle="As soon as we receive a request to issue an asset, you will proceed to the next step"
+      title="Issue Yes asset"
+      subTitle="After sending a request to issue the asset, you will proceed to the next step"
       extra={
         <a
-          href={`byteball${
+          href={`obyte${
             config.testnet ? "-tn" : ""
           }:${aaActive}?amount=10000&base64data=${dataBase64}`}
           className="ant-btn ant-btn-primary ant-btn-lg"
@@ -61,11 +61,11 @@ export default () => {
   currentBlock[1] = (
     <Result
       icon={<Icon type="loading" />}
-      title="Issue no_asset"
-      subTitle="As soon as we receive a request to issue an asset, you will proceed to the next step"
+      title="Issue No asset"
+      subTitle="After sending a request to issue the asset, you will proceed to the next step"
       extra={
         <a
-          href={`byteball${
+          href={`obyte${
             config.testnet ? "-tn" : ""
           }:${aaActive}?amount=10000&base64data=${dataBase64}`}
           className="ant-btn ant-btn-primary ant-btn-lg"
@@ -79,10 +79,10 @@ export default () => {
   currentBlock[2] = (
     <Result
       status="success"
-      title="Autonomous agent successfully configured"
+      title="Both assets issued and the market is operational"
       extra={
         <Link to="/" className="ant-btn ant-btn-primary ant-btn-lg">
-          Go home page
+          Go to home page
         </Link>
       }
     />
@@ -102,8 +102,8 @@ export default () => {
       {aaActive && (
         <div>
           <Steps current={current}>
-            <Step title="yes_asset" description="" />
-            <Step title="no_asset" description="" />
+            <Step title="Yes asset" description="" />
+            <Step title="No asset" description="" />
             <Step title="Finish" description="" />
           </Steps>
           <Row>{currentBlock[current]}</Row>

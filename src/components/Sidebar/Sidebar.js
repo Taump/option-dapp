@@ -8,11 +8,10 @@ const { Sider } = Layout;
 
 const dataMenu = [
   { key: "home", icon: "home", title: "Home", path: "/" },
-  { key: "deploy", icon: "plus-circle", title: "Deploy AA", path: "/deploy" },
   {
     key: "search",
     icon: "search",
-    title: "Search AA",
+    title: "Search markets",
     path: "/search"
   },
   {
@@ -20,7 +19,8 @@ const dataMenu = [
     icon: "setting",
     title: "Issuing assets",
     path: "/issuing_assets"
-  }
+  },
+  { key: "deploy", icon: "plus-circle", title: "Create", path: "/deploy" }
 ];
 
 export const Sidebar = ({ active }) => {
@@ -29,7 +29,7 @@ export const Sidebar = ({ active }) => {
       <div className={styles.logo}>
         <img src="/logo.png" className={styles.logo__img} alt="Obyte" />
         <div className={styles.brand}>
-          Obyte <div className={styles.product}>Option contract</div>
+          Obyte <div className={styles.product}>Prediction markets</div>
         </div>
       </div>
       <Menu theme="light" defaultSelectedKeys={[active]}>

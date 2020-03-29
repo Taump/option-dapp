@@ -11,7 +11,9 @@ import {
   CLEAR_SUBSCRIBE_AA,
   SUBSCRIBE_BASE_AA,
   ADD_AA_TO_LIST,
-  LOADING_FULL_NOTIFICATION
+  LOADING_FULL_NOTIFICATION,
+  CLOSE_NETWORK,
+  OPEN_NETWORK
 } from "../types/aa";
 import { notification } from "antd";
 import moment from "moment";
@@ -59,7 +61,13 @@ export const getAasByBase = () => async dispatch => {
     console.log("error", e);
   }
 };
+export const openNetwork = () => ({
+  type: OPEN_NETWORK
+});
 
+export const closeNetwork = () => ({
+  type: CLOSE_NETWORK
+});
 export const changeActiveAA = address => async (dispatch, getState) => {
   try {
     const store = getState();
@@ -95,10 +103,11 @@ export const changeActiveAA = address => async (dispatch, getState) => {
   }
 };
 
-export const updateInfoActiveAA = address => async (dispatch, getState) => {
+export const updateInfoActiveAA = () => async (dispatch, getState) => {
   try {
     const store = getState();
-    if (store.deploy.wasIssued !== address) {
+    const address = store.aa.active;
+    if (address && store.deploy.wasIssued !== address) {
       const aaState = await client.api.getAaStateVars({ address });
       dispatch({
         type: UPDATE_INFO_ACTIVE_AA,
@@ -197,7 +206,7 @@ export const watchRequestAas = () => (dispatch, getState) => {
           result[1].body.messages[0].payload.address;
         if (address) {
           openNotificationRequest(
-            "Deployment Request for New AA",
+            "Request to create a new market",
             `Its address is ${address}`
           );
           const params =
@@ -243,7 +252,7 @@ export const watchRequestAas = () => (dispatch, getState) => {
           result[1].body.messages[0].payload.definition;
         if (address && definition) {
           openNotificationRequest(
-            "AA was successfully deployed",
+            "New market created",
             `Its address is ${address}`
           );
           const {

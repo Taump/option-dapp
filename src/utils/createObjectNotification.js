@@ -13,7 +13,7 @@ const createObjectResponseNotification = (data, aaVars) => {
       if ("yes_asset" in resVars) {
         return {
           AA: address,
-          title: "Yes_asset was issued",
+          title: "Yes asset was issued",
           tag: "res_yes",
           time,
           trigger_unit
@@ -21,7 +21,7 @@ const createObjectResponseNotification = (data, aaVars) => {
       } else if ("no_asset" in resVars) {
         return {
           AA: address,
-          title: "No_asset was issued",
+          title: "No asset was issued",
           tag: "res_no",
           time,
           trigger_unit
@@ -29,7 +29,7 @@ const createObjectResponseNotification = (data, aaVars) => {
       } else if ("winner" in resVars) {
         return {
           AA: address,
-          title: `${resVars.winner}_asset was chosen as the winner by ${data.trigger_address}`,
+          title: `${resVars.winner} asset was chosen as winner by ${data.trigger_address}`,
           tag: "res_winner",
           time: data.timestamp,
           trigger_unit
@@ -97,7 +97,7 @@ const createObjectResponseNotification = (data, aaVars) => {
             if (amount) {
               return {
                 AA: address,
-                title: `${data.trigger_address} bought ${amount} bytes`,
+                title: `${data.trigger_address} redeemed ${amount} bytes`,
                 tag: "res_bought",
                 time,
                 trigger_unit
@@ -113,7 +113,6 @@ const createObjectResponseNotification = (data, aaVars) => {
 };
 
 const createObjectRequestNotification = (data, aaVars) => {
-  console.log("data request", data);
   if (
     data.body.unit.messages[0].payload &&
     data.body.unit.messages[1] &&
@@ -133,7 +132,7 @@ const createObjectRequestNotification = (data, aaVars) => {
     if ("define_yes" in payload) {
       return {
         AA,
-        title: "Request for issue yes_asset",
+        title: "Request to issue Yes asset",
         tag: "req_yes",
         time,
         trigger_unit
@@ -141,7 +140,7 @@ const createObjectRequestNotification = (data, aaVars) => {
     } else if ("define_no" in payload) {
       return {
         AA,
-        title: "Request for issue no_asset",
+        title: "Request to issue No asset",
         tag: "req_no",
         time,
         trigger_unit
@@ -171,7 +170,7 @@ const createObjectRequestNotification = (data, aaVars) => {
         console.log("redemption", data);
         return {
           AA: AA,
-          title: `Redemption Request ${amount} bytes by ${author}`,
+          title: `Redemption request for ${amount} bytes by ${author}`,
           tag: "req_rede",
           time,
           trigger_unit
@@ -202,7 +201,7 @@ const createObjectRequestNotification = (data, aaVars) => {
     if (amount && author) {
       return {
         AA: AA,
-        title: `Investment Request ${amount} bytes by ${author}`,
+        title: `Investment request for ${amount} bytes by ${author}`,
         tag: "req_invest",
         time,
         trigger_unit

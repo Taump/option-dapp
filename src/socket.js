@@ -1,4 +1,4 @@
-import obyte from "obyte";
+import obyte from "./obyte.min";
 import config from "./config";
 
 const client = new obyte.Client("wss://obyte.org/bb-test", {
@@ -6,7 +6,4 @@ const client = new obyte.Client("wss://obyte.org/bb-test", {
   reconnect: true
 });
 
-setInterval(function() {
-  client.api.heartbeat();
-}, 10 * 1000);
 export default client;

@@ -165,7 +165,7 @@ export default () => {
   };
 
   return (
-    <Layout title="Search AA" page="search">
+    <Layout title="Search markets" page="search">
       <Row>
         <SearchAaForm handleChangeSearchFormAA={handleChangeSearchFormAA} />
       </Row>

@@ -52,10 +52,10 @@ export const SelectAA = props => {
       {...props}
     >
       <Option key={"AA0"} value={0} disabled>
-        Select a AA
+        Select a market
       </Option>
       {recentActive && recentAas.length >= 1 && (
-        <OptGroup label="Recent AAs">
+        <OptGroup label="Recent markets">
           {recentAas &&
             recentAas.map((aa, i) => {
               return (
@@ -72,7 +72,8 @@ export const SelectAA = props => {
       )}
       <OptGroup
         label={
-          (recentActive && recentAas.length >= 1 && "Other AAs") || "All AAs"
+          (recentActive && recentAas.length >= 1 && "Other markets") ||
+          "All markets"
         }
       >
         {notRecentAaListByBase.map((aa, i) => {
