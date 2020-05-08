@@ -7,15 +7,15 @@ const { Content } = LayoutAntd;
 const { Title } = Typography;
 
 export const Layout = ({ children, title, page }) => (
-  <LayoutAntd className={styles.layout}>
-    <Sidebar active={page} />
-    <LayoutAntd>
-      <Content className={styles.content}>
-        <div className={styles.wrap}>
-          <Title level={1}>{title}</Title>
-          {children}
-        </div>
-      </Content>
-    </LayoutAntd>
-  </LayoutAntd>
+	<LayoutAntd className={styles.layout}>
+		<Sidebar active={page} />
+		<LayoutAntd>
+			<Content className={styles.content}>
+				<div className={styles.wrap}>
+					<Title level={1}>{title}</Title>
+					{children}
+				</div>
+			</Content>
+		</LayoutAntd>
+	</LayoutAntd>
 );

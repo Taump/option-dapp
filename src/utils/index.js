@@ -4,8 +4,8 @@ import isAddressByBase from "./isAddressByBase";
 import createStringDescrForAa from "./createStringDescrForAa";
 
 export default {
-  createObjectNotification,
-  toNumericValue,
-  isAddressByBase,
-  createStringDescrForAa
+	createObjectNotification,
+	toNumericValue,
+	isAddressByBase,
+	createStringDescrForAa
 };

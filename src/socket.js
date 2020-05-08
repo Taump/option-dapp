@@ -1,9 +1,12 @@
-import obyte from "./obyte.min";
+import obyte from "obytenewfork";
 import config from "./config";
 
-const client = new obyte.Client("wss://obyte.org/bb-test", {
-  testnet: config.testnet,
-  reconnect: true
-});
+const client = new obyte.Client(
+	`wss://obyte.org/bb${config.testnet ? "-test" : ""}`,
+	{
+		testnet: config.testnet,
+		reconnect: true
+	}
+);
 
 export default client;

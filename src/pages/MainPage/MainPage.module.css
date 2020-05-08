@@ -1,11 +1,11 @@
 .SelectAaRow {
-    margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
-.activeBalance{
-    background-color: #f0f2f5;
-    word-break: break-all;
-    padding: 25px;
-    border-radius: 5px;
-    font-size: 18px;
+.activeBalance {
+  background-color: #f0f2f5;
+  word-break: break-all;
+  padding: 25px;
+  border-radius: 5px;
+  font-size: 18px;
 }
